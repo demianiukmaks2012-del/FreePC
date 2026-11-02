@@ -791,6 +791,14 @@
                     </button>
                 </div>
 
+                <!-- Baldi Math Quiz Toggle -->
+                <div class="crt-toggle-box" style="margin-top: 8px;">
+                    <span>📐 Математика Балді:</span>
+                    <button type="button" id="mathQuizToggleBtn" class="retro-btn" style="padding: 4px 10px; font-size: 13px; background-color: #76ff03;">
+                        ВКЛ 🟢
+                    </button>
+                </div>
+
                 <div style="text-align: center; font-size: 12px; font-weight: bold; margin-top: 15px; border-top: 2px dashed #000; padding-top: 6px;">
                     © FreePC Baldi 1999 • Школа №101
                 </div>
@@ -829,11 +837,21 @@
                 </h2>
                 <div class="form-group">
                     <label class="form-label">Ім'я та Прізвище:</label>
-                    <input type="text" id="nameInput" class="form-input" placeholder="Введіть повне ім'я...">
+                    <input type="text" id="nameInput" class="form-input" placeholder="Введіть ваше справжнє повне ім'я...">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Група / Клас:</label>
-                    <input type="text" id="groupInput" class="form-input" placeholder="Наприклад: КІ-22 або 10-А...">
+                    <select id="groupInput" class="form-select">
+                        <option value="">-- Оберіть вашу групу / клас --</option>
+                        <option value="10-А">10-А клас</option>
+                        <option value="10-Б">10-Б клас</option>
+                        <option value="11-А">11-А клас</option>
+                        <option value="11-Б">11-Б клас</option>
+                        <option value="КІ-21">Група КІ-21 (Комп'ютерна інженерія)</option>
+                        <option value="КІ-22">Група КІ-22 (Комп'ютерна інженерія)</option>
+                        <option value="ІПЗ-23">Група ІПЗ-23 (Програмна інженерія)</option>
+                        <option value="Вчитель">Викладацький склад / Гість</option>
+                    </select>
                 </div>
                 <div style="display: flex; align-items: center; gap: 15px; margin-top: 20px;">
                     <button type="button" id="saveProfileBtn" class="retro-btn btn-profile" style="background-color: #ec407a; color: #fff;">
@@ -1032,15 +1050,31 @@
                     <span>🔒 ADMIN</span>
                 </div>
 
-                <!-- Admin Auth Box -->
+                <!-- Admin Auth Box (Two-step verification: Step 1 password 'baldi', Step 2 code 'school') -->
                 <div id="adminAuthBox" style="background: #fff9c4; border: 3px solid #000; padding: 20px; text-align: center;">
-                    <h3 style="font-weight: 900; margin-bottom: 10px;">Введіть пароль викладача для доступу:</h3>
-                    <div style="display: flex; justify-content: center; gap: 10px; max-width: 380px; margin: 0 auto;">
-                        <input type="password" id="adminPasswordInput" class="form-input" placeholder="Пароль...">
-                        <button type="button" id="adminLoginBtn" class="retro-btn btn-admin">Увійти</button>
+                    <div id="adminStep1Box">
+                        <h3 style="font-weight: 900; margin-bottom: 6px;">Етап 1: Введіть пароль викладача</h3>
+                        <p style="font-size: 13px; color: #555; margin-bottom: 12px;">(Підказка для персоналу школи: <code>baldi</code>)</p>
+                        <div style="display: flex; justify-content: center; gap: 10px; max-width: 380px; margin: 0 auto;">
+                            <input type="password" id="adminPasswordInput" class="form-input" placeholder="Пароль...">
+                            <button type="button" id="adminStep1Btn" class="retro-btn btn-admin">Далі ➔</button>
+                        </div>
                     </div>
+
+                    <div id="adminStep2Box" class="hidden">
+                        <h3 style="font-weight: 900; margin-bottom: 6px; color: #d32f2f;">Етап 2: Введіть код безпеки школи</h3>
+                        <p style="font-size: 13px; color: #555; margin-bottom: 12px;">(Секретне кодове слово: <code>school</code>)</p>
+                        <div style="display: flex; justify-content: center; gap: 10px; max-width: 380px; margin: 0 auto;">
+                            <input type="password" id="adminSecurityCodeInput" class="form-input" placeholder="Код безпеки...">
+                            <button type="button" id="adminLoginBtn" class="retro-btn btn-admin" style="background-color: #2e7d32; color: #fff;">Підтвердити</button>
+                        </div>
+                        <button type="button" id="adminBackToStep1Btn" style="background: none; border: none; text-decoration: underline; cursor: pointer; font-size: 13px; font-weight: bold; margin-top: 10px;">
+                            ← Назад до кроку 1
+                        </button>
+                    </div>
+
                     <div id="adminAuthError" class="hidden" style="color: #d32f2f; font-weight: 900; margin-top: 10px;">
-                        Невірний пароль! Балді незадоволений і ляскає лінійкою! 📏
+                        Невірні дані доступу! Балді незадоволений і ляскає лінійкою! 📏
                     </div>
                 </div>
 
@@ -1177,6 +1211,38 @@
         </div>
     </div>
 
+    <!-- Baldi's Math Quiz Modal (Mini-Game before PC Reservation) -->
+    <div id="mathQuizModal" class="retro-modal-backdrop hidden">
+        <div class="retro-modal" style="max-width: 440px; background: #fffde7; text-align: center;">
+            <div class="modal-header" style="justify-content: center; background: #2e7d32; color: #fff; padding: 8px;">
+                <h3 style="font-size: 18px; font-weight: 900;">📐 МАТЕМАТИЧНИЙ ТЕСТ БАЛДІ 📐</h3>
+            </div>
+            
+            <div style="margin: 15px 0;">
+                <p style="font-weight: 900; font-size: 14px; margin-bottom: 8px;">
+                    «Щоб отримати комп'ютер, розв'яжи математичну задачу від Балді!»
+                </p>
+                <div id="quizQuestionBox" style="font-size: 26px; font-weight: 900; background: #fff; border: 3px solid #000; padding: 12px; margin: 12px 0; box-shadow: 4px 4px 0 #000;">
+                    2 + 2 = ?
+                </div>
+                <input type="number" id="quizAnswerInput" class="form-input" placeholder="Ваша відповідь..." style="text-align: center; font-size: 22px; width: 160px; margin: 0 auto; display: block;">
+                
+                <div id="quizFeedback" class="hidden" style="font-weight: 900; margin-top: 10px; font-size: 14px;"></div>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                <button type="button" id="submitQuizBtn" class="retro-btn" style="background: #2e7d32; color: #fff; font-size: 16px;">
+                    Відповісти ➔
+                </button>
+                <button type="button" id="cancelQuizBtn" class="retro-btn" style="background: #e0e0e0; font-size: 14px;">
+                    Скасувати
+                </button>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+
     <!-- ================= JAVASCRIPT APP LOGIC ================= -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -1255,11 +1321,12 @@
                 classrooms: safeGetJSON('freePC_classrooms', DEFAULT_CLASSROOMS),
                 occupiedPcs: safeGetJSON('freePC_occupiedPcs', {
                     '101': { 2: { student: 'Олександр К.', group: 'КІ-21' } },
-                    '102': { 3: { student: 'Марія В.', group: 'ІПЗ-22' } }
+                    '102': { 3: { student: 'Марія В.', group: 'ІПЗ-23' } }
                 }),
                 activeCabinet: '101',
                 currentView: 'profile',
                 crtEnabled: safeGetJSON('freePC_crt', false),
+                mathQuizEnabled: safeGetJSON('freePC_mathQuiz', true),
                 adminUnlocked: false,
                 activeFilterSoftware: 'all',
                 selectedModalPc: null
@@ -1297,6 +1364,7 @@
             const resetFilterBtn = document.getElementById('resetFilterBtn');
             const bookingCardContent = document.getElementById('bookingCardContent');
             const crtToggleBtn = document.getElementById('crtToggleBtn');
+            const mathQuizToggleBtn = document.getElementById('mathQuizToggleBtn');
             const crtOverlay = document.getElementById('crtOverlay');
             const navTabs = document.querySelectorAll('.nav-tab');
             const viewSections = document.querySelectorAll('.view-section');
@@ -1317,12 +1385,25 @@
             const sessionDurationSelect = document.getElementById('sessionDurationSelect');
             const confirmBookingBtn = document.getElementById('confirmBookingBtn');
 
+            // Math Quiz Modal Elements
+            const mathQuizModal = document.getElementById('mathQuizModal');
+            const quizQuestionBox = document.getElementById('quizQuestionBox');
+            const quizAnswerInput = document.getElementById('quizAnswerInput');
+            const quizFeedback = document.getElementById('quizFeedback');
+            const submitQuizBtn = document.getElementById('submitQuizBtn');
+            const cancelQuizBtn = document.getElementById('cancelQuizBtn');
+
             // Admin Elements
             const adminSecretBtn = document.getElementById('adminSecretBtn');
             const adminAuthBox = document.getElementById('adminAuthBox');
+            const adminStep1Box = document.getElementById('adminStep1Box');
+            const adminStep2Box = document.getElementById('adminStep2Box');
             const adminDashboardBox = document.getElementById('adminDashboardBox');
             const adminPasswordInput = document.getElementById('adminPasswordInput');
+            const adminSecurityCodeInput = document.getElementById('adminSecurityCodeInput');
+            const adminStep1Btn = document.getElementById('adminStep1Btn');
             const adminLoginBtn = document.getElementById('adminLoginBtn');
+            const adminBackToStep1Btn = document.getElementById('adminBackToStep1Btn');
             const adminAuthError = document.getElementById('adminAuthError');
             const adminLogoutBtn = document.getElementById('adminLogoutBtn');
             const adminClearAllBookingsBtn = document.getElementById('adminClearAllBookingsBtn');
@@ -1526,25 +1607,43 @@
             /* =========================================================
                6. PROFILE SAVING (Stage 1.1)
                ========================================================= */
+            function sanitizeHTML(str) {
+                const temp = document.createElement('div');
+                temp.textContent = str;
+                return temp.innerHTML;
+            }
+
             saveProfileBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 const name = nameInput.value.trim();
                 const group = groupInput.value.trim();
 
-                if (!name || !group) {
+                // Validate real name: must be at least 3 characters and not a placeholder
+                const placeholderRe = /^(test|user|admin|йцукен|тест|asdf|qwerty|\d+)$/i;
+                if (!name || name.length < 3 || placeholderRe.test(name)) {
                     triggerBaldiEmotion('angry');
-                    updateBaldiSpeech("Увага! Обидва поля (Ім'я та Клас) мають бути обов'язково заповнені!");
+                    updateBaldiSpeech("Увага! Вкажіть справжнє повне ім'я учня (не менше 3 літер без плейсхолдерів)!");
+                    alert("⚠️ Введіть справжнє ім'я учня (мінімум 3 літери)!");
+                    nameInput.focus();
                     return;
                 }
 
-                state.profile = { name, group };
+                if (!group) {
+                    triggerBaldiEmotion('angry');
+                    updateBaldiSpeech("Оберіть вашу групу чи клас зі списку!");
+                    alert("⚠️ Будь ласка, оберіть вашу групу / клас зі списку!");
+                    groupInput.focus();
+                    return;
+                }
+
+                state.profile = { name: sanitizeHTML(name), group: sanitizeHTML(group) };
                 safeSetJSON('freePC_profile', state.profile);
 
                 savedTag.classList.remove('hidden');
                 setTimeout(() => savedTag.classList.add('hidden'), 2500);
 
                 triggerBaldiEmotion('celebrate');
-                updateBaldiSpeech(`Чудово, ${name}! Профіль успішно збережено в журналі. Обирай кабінет!`);
+                updateBaldiSpeech(`Чудово, ${state.profile.name}! Профіль (${state.profile.group}) успішно збережено. Обирай кабінет!`);
                 setTimeout(() => switchView('cabinet'), 700);
             });
 
@@ -1689,6 +1788,103 @@
                 pcDetailsModal.classList.add('hidden');
             });
 
+            /* =========================================================
+               2.1 BALDI MATH QUIZ MINI-GAME SYSTEM
+               ========================================================= */
+            let pendingBookingData = null;
+            let currentQuizAnswer = 4;
+
+            function setMathQuizState(enabled) {
+                state.mathQuizEnabled = enabled;
+                safeSetJSON('freePC_mathQuiz', enabled);
+                if (enabled) {
+                    mathQuizToggleBtn.textContent = 'ВКЛ 🟢';
+                    mathQuizToggleBtn.style.backgroundColor = '#76ff03';
+                } else {
+                    mathQuizToggleBtn.textContent = 'ВИКЛ ⚪';
+                    mathQuizToggleBtn.style.backgroundColor = '#fff';
+                }
+            }
+            setMathQuizState(state.mathQuizEnabled);
+
+            mathQuizToggleBtn.addEventListener('click', () => {
+                setMathQuizState(!state.mathQuizEnabled);
+                triggerBaldiEmotion('talking');
+                updateBaldiSpeech(state.mathQuizEnabled ? "Математичний тест увімкнено! Тепер кожен має розв'язати приклад!" : "Тест вимкнено. Бронювання буде прямим.");
+            });
+
+            function generateMathQuiz() {
+                const a = Math.floor(Math.random() * 8) + 2;
+                const b = Math.floor(Math.random() * 8) + 2;
+                const isMultiply = Math.random() > 0.5;
+                if (isMultiply) {
+                    currentQuizAnswer = a * b;
+                    quizQuestionBox.textContent = `${a} × ${b} = ?`;
+                } else {
+                    currentQuizAnswer = a + b;
+                    quizQuestionBox.textContent = `${a} + ${b} = ?`;
+                }
+                quizAnswerInput.value = '';
+                quizFeedback.className = 'hidden';
+            }
+
+            function finalizeBooking() {
+                if (!pendingBookingData) return;
+                state.booking = pendingBookingData;
+                safeSetJSON('freePC_booking', state.booking);
+
+                // Add to occupied list
+                if (!state.occupiedPcs[state.activeCabinet]) {
+                    state.occupiedPcs[state.activeCabinet] = {};
+                }
+                state.occupiedPcs[state.activeCabinet][state.booking.pcId] = {
+                    student: state.profile.name,
+                    group: state.profile.group
+                };
+                safeSetJSON('freePC_occupiedPcs', state.occupiedPcs);
+
+                pendingBookingData = null;
+                mathQuizModal.classList.add('hidden');
+                triggerBaldiEmotion('celebrate');
+                updateBaldiSpeech(`Вітаю, ${state.profile.name}! ПК #${state.booking.pcId} успішно закріплено за тобою!`);
+                updateUI();
+                render2DClassroom();
+            }
+
+            submitQuizBtn.addEventListener('click', () => {
+                const val = parseInt(quizAnswerInput.value.trim(), 10);
+                if (isNaN(val)) {
+                    quizFeedback.textContent = "Введіть числове значення!";
+                    quizFeedback.style.color = "#d32f2f";
+                    quizFeedback.classList.remove('hidden');
+                    return;
+                }
+
+                if (val === currentQuizAnswer) {
+                    quizFeedback.textContent = "Правильно! Ти отримав сяючу золоту зірочку! ⭐";
+                    quizFeedback.style.color = "#2e7d32";
+                    quizFeedback.classList.remove('hidden');
+                    triggerBaldiEmotion('celebrate');
+                    setTimeout(() => finalizeBooking(), 700);
+                } else {
+                    quizFeedback.textContent = "НЕПРАВИЛЬНО! Балді сердито б'є лінійкою по дошці! 📏 Спробуй ще раз!";
+                    quizFeedback.style.color = "#d32f2f";
+                    quizFeedback.classList.remove('hidden');
+                    triggerBaldiEmotion('angry');
+                    quizAnswerInput.select();
+                }
+            });
+
+            quizAnswerInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') submitQuizBtn.click();
+            });
+
+            cancelQuizBtn.addEventListener('click', () => {
+                mathQuizModal.classList.add('hidden');
+                pendingBookingData = null;
+                updateBaldiSpeech("Бронювання скасовано, бо ти злякався математичного тесту!");
+            });
+
             // Confirm Booking Action (Stage 5.1 & 5.2)
             confirmBookingBtn.addEventListener('click', () => {
                 if (!state.selectedModalPc) return;
@@ -1714,7 +1910,7 @@
                     ? 20 * 1000
                     : durationMinutes * 60 * 1000;
 
-                state.booking = {
+                const bookingCandidate = {
                     pcId: state.selectedModalPc.id,
                     cabinet: state.activeCabinet,
                     userName: state.profile.name,
@@ -1724,23 +1920,19 @@
                     durationMinutes: durationMinutes
                 };
 
-                safeSetJSON('freePC_booking', state.booking);
-
-                // Add to occupied list
-                if (!state.occupiedPcs[state.activeCabinet]) {
-                    state.occupiedPcs[state.activeCabinet] = {};
-                }
-                state.occupiedPcs[state.activeCabinet][state.selectedModalPc.id] = {
-                    student: state.profile.name,
-                    group: state.profile.group
-                };
-                safeSetJSON('freePC_occupiedPcs', state.occupiedPcs);
-
                 pcDetailsModal.classList.add('hidden');
-                triggerBaldiEmotion('celebrate');
-                updateBaldiSpeech(`Вітаю, ${state.profile.name}! ПК #${state.booking.pcId} успішно закріплено за тобою!`);
-                updateUI();
-                render2DClassroom();
+
+                if (state.mathQuizEnabled) {
+                    pendingBookingData = bookingCandidate;
+                    generateMathQuiz();
+                    mathQuizModal.classList.remove('hidden');
+                    triggerBaldiEmotion('talking');
+                    updateBaldiSpeech("Перед отриманням ПК дай правильну відповідь на задачу!");
+                    setTimeout(() => quizAnswerInput.focus(), 100);
+                } else {
+                    pendingBookingData = bookingCandidate;
+                    finalizeBooking();
+                }
             });
 
             /* =========================================================
@@ -1877,24 +2069,59 @@
                 switchView('admin');
             });
 
-            adminLoginBtn.addEventListener('click', () => {
+            /* Two-Step Authentication sequence */
+            adminStep1Btn.addEventListener('click', () => {
                 const pass = adminPasswordInput.value.trim().toLowerCase();
                 if (pass === 'baldi') {
+                    adminAuthError.classList.add('hidden');
+                    adminStep1Box.classList.add('hidden');
+                    adminStep2Box.classList.remove('hidden');
+                    adminSecurityCodeInput.value = '';
+                    adminSecurityCodeInput.focus();
+                    triggerBaldiEmotion('talking');
+                    updateBaldiSpeech("Пароль правильний! Тепер введіть секретний код безпеки школи!");
+                } else {
+                    adminAuthError.classList.remove('hidden');
+                    triggerBaldiEmotion('angry');
+                    updateBaldiSpeech("Невірний пароль! Тільки вчитель знає секретний пароль від класу!");
+                }
+            });
+
+            adminBackToStep1Btn.addEventListener('click', () => {
+                adminStep2Box.classList.add('hidden');
+                adminStep1Box.classList.remove('hidden');
+                adminAuthError.classList.add('hidden');
+            });
+
+            adminLoginBtn.addEventListener('click', () => {
+                const code = adminSecurityCodeInput.value.trim().toLowerCase();
+                if (code === 'school') {
                     state.adminUnlocked = true;
                     adminAuthError.classList.add('hidden');
                     renderAdminView();
                     triggerBaldiEmotion('celebrate');
-                    updateBaldiSpeech("Доступ дозволено! Ласкаво просимо, шановний викладачу!");
+                    updateBaldiSpeech("Двоетапну перевірку пройдено! Ласкаво просимо, шановний викладачу!");
                 } else {
                     adminAuthError.classList.remove('hidden');
                     triggerBaldiEmotion('angry');
-                    updateBaldiSpeech("Невірний пароль! Тільки вчитель знає секретний код від класу!");
+                    updateBaldiSpeech("Невірний код безпеки школи! Балді гнівається і б'є лінійкою!");
                 }
+            });
+
+            adminPasswordInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') adminStep1Btn.click();
+            });
+
+            adminSecurityCodeInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') adminLoginBtn.click();
             });
 
             adminLogoutBtn.addEventListener('click', () => {
                 state.adminUnlocked = false;
                 adminPasswordInput.value = '';
+                adminSecurityCodeInput.value = '';
+                adminStep2Box.classList.add('hidden');
+                adminStep1Box.classList.remove('hidden');
                 renderAdminView();
                 updateBaldiSpeech("Вихід з режиму викладача здійснено.");
             });
