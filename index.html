@@ -740,6 +740,252 @@
             display: inline-block;
         }
 
+        /* =========================================================
+           YOU CAN THINK PAD DEVICE (AUTHENTIC BALDI'S BASICS)
+           ========================================================= */
+        .thinkpad-container {
+            position: relative;
+            background: #2ebd1b; /* Molded chunky retro green */
+            border: 6px solid #000;
+            border-radius: 28px;
+            box-shadow: 10px 10px 0px #000, inset -6px -6px 0px rgba(0,0,0,0.25), inset 6px 6px 0px rgba(255,255,255,0.4);
+            padding: 22px 18px 18px 18px;
+            width: 100%;
+            max-width: 620px;
+            margin: 0 auto;
+            user-select: none;
+        }
+
+        /* Top device antenna & power badge */
+        .thinkpad-antenna {
+            position: absolute;
+            top: -24px;
+            left: 36px;
+            width: 14px;
+            height: 24px;
+            background: #888;
+            border: 4px solid #000;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+        }
+        .thinkpad-antenna::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: -5px;
+            width: 16px;
+            height: 12px;
+            background: #d32f2f;
+            border: 3px solid #000;
+            border-radius: 50%;
+        }
+
+        .thinkpad-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 0 6px;
+        }
+
+        .thinkpad-title {
+            font-size: 22px;
+            font-weight: 900;
+            color: #ffff00;
+            text-shadow: 3px 3px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+            letter-spacing: 1px;
+            font-family: 'Arial Black', Impact, sans-serif;
+        }
+
+        .thinkpad-body-grid {
+            display: grid;
+            grid-template-columns: 1.35fr 1fr;
+            gap: 16px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 600px) {
+            .thinkpad-body-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Left Side: White Screen Area */
+        .thinkpad-screen-frame {
+            background: #e0e0e0;
+            border: 5px solid #000;
+            border-radius: 12px;
+            box-shadow: inset 4px 4px 0 #888;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .thinkpad-white-screen {
+            background: #ffffff;
+            border: 4px solid #000;
+            border-radius: 6px;
+            padding: 12px 10px;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left;
+        }
+
+        .thinkpad-q-label {
+            font-size: 16px;
+            font-weight: 900;
+            color: #000;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .thinkpad-equation-row {
+            font-size: 28px;
+            font-weight: 900;
+            color: #000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 8px 0;
+            font-family: 'Courier New', monospace, monospace;
+        }
+
+        .thinkpad-answer-box {
+            display: inline-block;
+            min-width: 90px;
+            padding: 4px 10px;
+            background: #ffffb3;
+            border: 3px solid #000;
+            font-size: 28px;
+            font-weight: 900;
+            color: #000;
+            text-align: center;
+            box-shadow: inset 2px 2px 0 #aaa;
+        }
+
+        .thinkpad-feedback-text {
+            font-size: 13px;
+            font-weight: 900;
+            min-height: 20px;
+            margin-top: 4px;
+        }
+
+        /* Bottom-left: Baldi Face Camera Box */
+        .thinkpad-baldi-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #c8e6c9;
+            border: 4px solid #000;
+            border-radius: 8px;
+            padding: 6px;
+            margin-top: 10px;
+        }
+
+        .thinkpad-baldi-portrait {
+            width: 58px;
+            height: 64px;
+            min-width: 58px;
+            border: 3px solid #000;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .thinkpad-baldi-portrait img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            mix-blend-mode: multiply;
+        }
+
+        .thinkpad-baldi-quote {
+            font-size: 12px;
+            font-weight: bold;
+            color: #000;
+            line-height: 1.25;
+        }
+
+        /* Right Side: Chunky Purple Keypad */
+        .thinkpad-keypad-frame {
+            background: #1e8213;
+            border: 5px solid #000;
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .thinkpad-keys-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .tp-btn {
+            background: #7b1fa2; /* Chunky Purple */
+            color: #ffffff;
+            border: 3px solid #000;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: 900;
+            padding: 10px 0;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 3px 3px 0 #000, inset 2px 2px 0 rgba(255,255,255,0.4);
+            transition: transform 0.05s, box-shadow 0.05s;
+        }
+
+        .tp-btn:hover {
+            background: #8e24aa;
+        }
+
+        .tp-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 #000;
+        }
+
+        .tp-btn-clear {
+            background: #d32f2f;
+        }
+        .tp-btn-clear:hover {
+            background: #e53935;
+        }
+
+        /* Large Round Purple OK Button */
+        .tp-btn-ok {
+            background: #9c27b0;
+            color: #ffff00;
+            border: 4px solid #000;
+            border-radius: 12px;
+            font-size: 24px;
+            font-weight: 900;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 4px 4px 0 #000, inset 2px 2px 0 rgba(255,255,255,0.5);
+            text-shadow: 2px 2px 0 #000;
+            transition: transform 0.05s, box-shadow 0.05s;
+            width: 100%;
+        }
+
+        .tp-btn-ok:hover {
+            background: #ab47bc;
+        }
+
+        .tp-btn-ok:active {
+            transform: translate(3px, 3px);
+            box-shadow: 1px 1px 0 #000;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -986,7 +1232,7 @@
                 </div>
                 <div style="background-color: #e8f5e9; border: 3px solid #000; padding: 15px;">
                     <h3 style="font-weight: 900; color: #2e7d32; margin-bottom: 8px;">🔑 Секретний режим вчителя</h3>
-                    <p>Подвійний клік на шкільну дошку або клік по кнопці «Режим вчителя» у меню відкриває адмін-панель (пароль за замовчуванням: <code>baldi</code> або <code>1234</code>).</p>
+                    <p>Подвійний клік на шкільну дошку або клік по кнопці «Режим вчителя» у меню відкриває адмін-панель для викладачів школи.</p>
                 </div>
             </section>
 
@@ -1050,22 +1296,20 @@
                     <span>🔒 ADMIN</span>
                 </div>
 
-                <!-- Admin Auth Box (Two-step verification: Step 1 password 'baldi', Step 2 code 'school') -->
+                <!-- Admin Auth Box (Two-step verification) -->
                 <div id="adminAuthBox" style="background: #fff9c4; border: 3px solid #000; padding: 20px; text-align: center;">
                     <div id="adminStep1Box">
-                        <h3 style="font-weight: 900; margin-bottom: 6px;">Етап 1: Введіть пароль викладача</h3>
-                        <p style="font-size: 13px; color: #555; margin-bottom: 12px;">(Підказка для персоналу школи: <code>baldi</code>)</p>
+                        <h3 style="font-weight: 900; margin-bottom: 12px;">Етап 1: Введіть пароль викладача</h3>
                         <div style="display: flex; justify-content: center; gap: 10px; max-width: 380px; margin: 0 auto;">
-                            <input type="password" id="adminPasswordInput" class="form-input" placeholder="Пароль...">
+                            <input type="password" id="adminPasswordInput" class="form-input" placeholder="Введіть пароль...">
                             <button type="button" id="adminStep1Btn" class="retro-btn btn-admin">Далі ➔</button>
                         </div>
                     </div>
 
                     <div id="adminStep2Box" class="hidden">
-                        <h3 style="font-weight: 900; margin-bottom: 6px; color: #d32f2f;">Етап 2: Введіть код безпеки школи</h3>
-                        <p style="font-size: 13px; color: #555; margin-bottom: 12px;">(Секретне кодове слово: <code>school</code>)</p>
+                        <h3 style="font-weight: 900; margin-bottom: 12px; color: #d32f2f;">Етап 2: Введіть код безпеки школи</h3>
                         <div style="display: flex; justify-content: center; gap: 10px; max-width: 380px; margin: 0 auto;">
-                            <input type="password" id="adminSecurityCodeInput" class="form-input" placeholder="Код безпеки...">
+                            <input type="password" id="adminSecurityCodeInput" class="form-input" placeholder="Введіть секретний код...">
                             <button type="button" id="adminLoginBtn" class="retro-btn btn-admin" style="background-color: #2e7d32; color: #fff;">Підтвердити</button>
                         </div>
                         <button type="button" id="adminBackToStep1Btn" style="background: none; border: none; text-decoration: underline; cursor: pointer; font-size: 13px; font-weight: bold; margin-top: 10px;">
@@ -1211,35 +1455,73 @@
         </div>
     </div>
 
-    <!-- Baldi's Math Quiz Modal (Mini-Game before PC Reservation) -->
+    <!-- Authentic "You Can Think Pad" Baldi Device Modal -->
     <div id="mathQuizModal" class="retro-modal-backdrop hidden">
-        <div class="retro-modal" style="max-width: 440px; background: #fffde7; text-align: center;">
-            <div class="modal-header" style="justify-content: center; background: #2e7d32; color: #fff; padding: 8px;">
-                <h3 style="font-size: 18px; font-weight: 900;">📐 МАТЕМАТИЧНИЙ ТЕСТ БАЛДІ 📐</h3>
-            </div>
-            
-            <div style="margin: 15px 0;">
-                <p style="font-weight: 900; font-size: 14px; margin-bottom: 8px;">
-                    «Щоб отримати комп'ютер, розв'яжи математичну задачу від Балді!»
-                </p>
-                <div id="quizQuestionBox" style="font-size: 26px; font-weight: 900; background: #fff; border: 3px solid #000; padding: 12px; margin: 12px 0; box-shadow: 4px 4px 0 #000;">
-                    2 + 2 = ?
+        <div class="thinkpad-container">
+            <!-- Antenna -->
+            <div class="thinkpad-antenna"></div>
+
+            <!-- Header -->
+            <div class="thinkpad-top-bar">
+                <div class="thinkpad-title">YOU CAN THINK PAD™</div>
+                <div style="background: #111; color: #76ff03; font-family: 'Courier New', monospace; font-size: 11px; padding: 2px 6px; border: 2px solid #000; font-weight: 900;">
+                    MATH-OS v1.0
                 </div>
-                <input type="number" id="quizAnswerInput" class="form-input" placeholder="Ваша відповідь..." style="text-align: center; font-size: 22px; width: 160px; margin: 0 auto; display: block;">
-                
-                <div id="quizFeedback" class="hidden" style="font-weight: 900; margin-top: 10px; font-size: 14px;"></div>
             </div>
 
-            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
-                <button type="button" id="submitQuizBtn" class="retro-btn" style="background: #2e7d32; color: #fff; font-size: 16px;">
-                    Відповісти ➔
-                </button>
-                <button type="button" id="cancelQuizBtn" class="retro-btn" style="background: #e0e0e0; font-size: 14px;">
-                    Скасувати
-                </button>
+            <!-- Main Interface Grid -->
+            <div class="thinkpad-body-grid">
+                
+                <!-- Left Screen & Baldi Portrait -->
+                <div class="thinkpad-screen-frame">
+                    <div class="thinkpad-white-screen">
+                        <div class="thinkpad-q-label" id="thinkpadQNum">SOLVE MATH Q1:</div>
+                        <div class="thinkpad-equation-row">
+                            <span id="quizEquationText">6 + 7 =</span>
+                            <span class="thinkpad-answer-box" id="quizAnswerDisplay">?</span>
+                        </div>
+                        <div class="thinkpad-feedback-text" id="quizFeedback">Введіть відповідь на клавіатурі!</div>
+                    </div>
+
+                    <!-- Baldi Face Portrait -->
+                    <div class="thinkpad-baldi-box">
+                        <div class="thinkpad-baldi-portrait">
+                            <img src="baldi.png" alt="Baldi Portrait">
+                        </div>
+                        <div class="thinkpad-baldi-quote" id="thinkpadBaldiQuote">
+                            «Розв'яжи приклад, щоб розблокувати ПК!»
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Chunky Purple Keypad -->
+                <div class="thinkpad-keypad-frame">
+                    <div class="thinkpad-keys-grid">
+                        <button type="button" class="tp-btn" data-key="7">7</button>
+                        <button type="button" class="tp-btn" data-key="8">8</button>
+                        <button type="button" class="tp-btn" data-key="9">9</button>
+                        <button type="button" class="tp-btn" data-key="4">4</button>
+                        <button type="button" class="tp-btn" data-key="5">5</button>
+                        <button type="button" class="tp-btn" data-key="6">6</button>
+                        <button type="button" class="tp-btn" data-key="1">1</button>
+                        <button type="button" class="tp-btn" data-key="2">2</button>
+                        <button type="button" class="tp-btn" data-key="3">3</button>
+                        <button type="button" class="tp-btn tp-btn-clear" id="tpKeyClear">C</button>
+                        <button type="button" class="tp-btn" data-key="0">0</button>
+                        <button type="button" class="tp-btn" data-key="-">-</button>
+                    </div>
+
+                    <!-- Large Round Purple OK Button -->
+                    <button type="button" class="tp-btn-ok" id="submitQuizBtn">
+                        OK! ➔
+                    </button>
+
+                    <button type="button" id="cancelQuizBtn" style="background: none; border: none; color: #fff; font-size: 11px; font-weight: bold; cursor: pointer; text-decoration: underline; margin-top: 8px;">
+                        [Скасувати та вийти]
+                    </button>
+                </div>
+
             </div>
-        </div>
-    </div>
         </div>
     </div>
 
@@ -1385,13 +1667,17 @@
             const sessionDurationSelect = document.getElementById('sessionDurationSelect');
             const confirmBookingBtn = document.getElementById('confirmBookingBtn');
 
-            // Math Quiz Modal Elements
+            // Math Quiz Thinkpad Elements
             const mathQuizModal = document.getElementById('mathQuizModal');
-            const quizQuestionBox = document.getElementById('quizQuestionBox');
-            const quizAnswerInput = document.getElementById('quizAnswerInput');
+            const thinkpadQNum = document.getElementById('thinkpadQNum');
+            const quizEquationText = document.getElementById('quizEquationText');
+            const quizAnswerDisplay = document.getElementById('quizAnswerDisplay');
             const quizFeedback = document.getElementById('quizFeedback');
+            const thinkpadBaldiQuote = document.getElementById('thinkpadBaldiQuote');
             const submitQuizBtn = document.getElementById('submitQuizBtn');
             const cancelQuizBtn = document.getElementById('cancelQuizBtn');
+            const tpKeyClear = document.getElementById('tpKeyClear');
+            const tpKeypadBtns = document.querySelectorAll('.tp-btn[data-key]');
 
             // Admin Elements
             const adminSecretBtn = document.getElementById('adminSecretBtn');
@@ -1789,10 +2075,12 @@
             });
 
             /* =========================================================
-               2.1 BALDI MATH QUIZ MINI-GAME SYSTEM
+               2.1 BALDI "YOU CAN THINK PAD" MATH SYSTEM
                ========================================================= */
             let pendingBookingData = null;
             let currentQuizAnswer = 4;
+            let currentQuizEntered = "";
+            let currentQIndex = 1;
 
             function setMathQuizState(enabled) {
                 state.mathQuizEnabled = enabled;
@@ -1810,23 +2098,76 @@
             mathQuizToggleBtn.addEventListener('click', () => {
                 setMathQuizState(!state.mathQuizEnabled);
                 triggerBaldiEmotion('talking');
-                updateBaldiSpeech(state.mathQuizEnabled ? "Математичний тест увімкнено! Тепер кожен має розв'язати приклад!" : "Тест вимкнено. Бронювання буде прямим.");
+                updateBaldiSpeech(state.mathQuizEnabled ? "Think Pad активовано! Тепер кожен має розв'язати приклад!" : "Think Pad вимкнено. Бронювання буде прямим.");
             });
 
+            function updateQuizDisplay() {
+                quizAnswerDisplay.textContent = currentQuizEntered.length > 0 ? currentQuizEntered : '?';
+            }
+
             function generateMathQuiz() {
+                currentQIndex = Math.floor(Math.random() * 3) + 1;
+                thinkpadQNum.textContent = `SOLVE MATH Q${currentQIndex}:`;
+
                 const a = Math.floor(Math.random() * 8) + 2;
                 const b = Math.floor(Math.random() * 8) + 2;
                 const isMultiply = Math.random() > 0.5;
+
                 if (isMultiply) {
                     currentQuizAnswer = a * b;
-                    quizQuestionBox.textContent = `${a} × ${b} = ?`;
+                    quizEquationText.textContent = `${a} × ${b} =`;
                 } else {
                     currentQuizAnswer = a + b;
-                    quizQuestionBox.textContent = `${a} + ${b} = ?`;
+                    quizEquationText.textContent = `${a} + ${b} =`;
                 }
-                quizAnswerInput.value = '';
-                quizFeedback.className = 'hidden';
+
+                currentQuizEntered = "";
+                updateQuizDisplay();
+
+                quizFeedback.textContent = "Введіть відповідь на клавіатурі Think Pad:";
+                quizFeedback.style.color = "#000";
+                thinkpadBaldiQuote.textContent = "«Розв'яжи приклад, щоб розблокувати ПК!»";
             }
+
+            // Keypad interaction
+            tpKeypadBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const k = btn.dataset.key;
+                    if (k === '-' && currentQuizEntered.length === 0) {
+                        currentQuizEntered = '-';
+                    } else if (k !== '-') {
+                        if (currentQuizEntered.length < 5) {
+                            currentQuizEntered += k;
+                        }
+                    }
+                    updateQuizDisplay();
+                });
+            });
+
+            tpKeyClear.addEventListener('click', () => {
+                currentQuizEntered = "";
+                updateQuizDisplay();
+            });
+
+            // Physical keyboard support for Think Pad
+            window.addEventListener('keydown', (e) => {
+                if (mathQuizModal.classList.contains('hidden')) return;
+
+                if (e.key >= '0' && e.key <= '9') {
+                    if (currentQuizEntered.length < 5) currentQuizEntered += e.key;
+                    updateQuizDisplay();
+                } else if (e.key === '-' && currentQuizEntered.length === 0) {
+                    currentQuizEntered = '-';
+                    updateQuizDisplay();
+                } else if (e.key === 'Backspace') {
+                    currentQuizEntered = currentQuizEntered.slice(0, -1);
+                    updateQuizDisplay();
+                } else if (e.key === 'Enter') {
+                    submitQuizBtn.click();
+                } else if (e.key === 'Escape') {
+                    cancelQuizBtn.click();
+                }
+            });
 
             function finalizeBooking() {
                 if (!pendingBookingData) return;
@@ -1852,37 +2193,33 @@
             }
 
             submitQuizBtn.addEventListener('click', () => {
-                const val = parseInt(quizAnswerInput.value.trim(), 10);
+                const val = parseInt(currentQuizEntered, 10);
                 if (isNaN(val)) {
-                    quizFeedback.textContent = "Введіть числове значення!";
+                    quizFeedback.textContent = "Введіть число за допомогою кнопок!";
                     quizFeedback.style.color = "#d32f2f";
-                    quizFeedback.classList.remove('hidden');
                     return;
                 }
 
                 if (val === currentQuizAnswer) {
-                    quizFeedback.textContent = "Правильно! Ти отримав сяючу золоту зірочку! ⭐";
+                    quizFeedback.textContent = "GREAT JOB! THAT'S RIGHT! ⭐";
                     quizFeedback.style.color = "#2e7d32";
-                    quizFeedback.classList.remove('hidden');
+                    thinkpadBaldiQuote.textContent = "«Неймовірна робота! Отримуй сяючу зірочку!»";
                     triggerBaldiEmotion('celebrate');
-                    setTimeout(() => finalizeBooking(), 700);
+                    setTimeout(() => finalizeBooking(), 750);
                 } else {
-                    quizFeedback.textContent = "НЕПРАВИЛЬНО! Балді сердито б'є лінійкою по дошці! 📏 Спробуй ще раз!";
+                    quizFeedback.textContent = "I GET ANGRIER FOR EVERY WRONG ANSWER! 📏";
                     quizFeedback.style.color = "#d32f2f";
-                    quizFeedback.classList.remove('hidden');
+                    thinkpadBaldiQuote.textContent = "«НЕПРАВИЛЬНО! Я стаю лютішим за кожну помилку!»";
                     triggerBaldiEmotion('angry');
-                    quizAnswerInput.select();
+                    currentQuizEntered = "";
+                    updateQuizDisplay();
                 }
-            });
-
-            quizAnswerInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') submitQuizBtn.click();
             });
 
             cancelQuizBtn.addEventListener('click', () => {
                 mathQuizModal.classList.add('hidden');
                 pendingBookingData = null;
-                updateBaldiSpeech("Бронювання скасовано, бо ти злякався математичного тесту!");
+                updateBaldiSpeech("Бронювання скасовано, бо ти злякався You Can Think Pad!");
             });
 
             // Confirm Booking Action (Stage 5.1 & 5.2)
@@ -1927,8 +2264,7 @@
                     generateMathQuiz();
                     mathQuizModal.classList.remove('hidden');
                     triggerBaldiEmotion('talking');
-                    updateBaldiSpeech("Перед отриманням ПК дай правильну відповідь на задачу!");
-                    setTimeout(() => quizAnswerInput.focus(), 100);
+                    updateBaldiSpeech("Перед отриманням ПК дай правильну відповідь на You Can Think Pad!");
                 } else {
                     pendingBookingData = bookingCandidate;
                     finalizeBooking();
