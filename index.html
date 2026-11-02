@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreePC – Baldi's Basics School Edition (Ultimate Upgrade)</title>
     <style>
-        /* CSS Reset & Base Styles */
+        /* CSS Reset & Base Styles - Authentic 90s Edutainment */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif, cursive;
+            font-family: 'Comic Sans MS', 'Comic Neue', 'Courier New', cursive, sans-serif;
             user-select: none;
+            border-radius: 0 !important; /* Strict sharp 90s aesthetic: zero rounded corners */
         }
 
         :root {
@@ -19,10 +20,11 @@
             --shadow-retro: 4px 4px 0px #000;
             --shadow-retro-lg: 6px 6px 0px #000;
             --shadow-retro-press: 2px 2px 0px #000;
+            --win-bg: #c0c0c0; /* Windows 95 classic grey */
         }
 
         body {
-            background-color: #f0f0f0;
+            background-color: #008080; /* Windows 95 classic teal desktop */
             color: #000;
             display: flex;
             min-height: 100vh;
@@ -180,9 +182,11 @@
             gap: 10px;
         }
 
+        /* Retro 90s Pixel Navigation Buttons with Authentic Bevel */
         .retro-btn {
-            border: var(--border-thick);
-            box-shadow: var(--shadow-retro);
+            border: 3px solid #000;
+            outline: none;
+            box-shadow: 4px 4px 0px #000;
             padding: 10px 14px;
             font-size: 16px;
             font-weight: 900;
@@ -191,41 +195,49 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: transform 0.05s, box-shadow 0.05s;
-            background-color: #fff;
+            transition: none;
+            background-color: #c0c0c0;
             color: #000;
+            border-top-color: #ffffff;
+            border-left-color: #ffffff;
+            border-right-color: #000000;
+            border-bottom-color: #000000;
         }
 
         .retro-btn:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: var(--shadow-retro-lg);
+            filter: brightness(1.08);
         }
 
         .retro-btn:active {
+            box-shadow: inset 2px 2px 0px #000;
             transform: translate(2px, 2px);
-            box-shadow: var(--shadow-retro-press);
+            border-top-color: #000000;
+            border-left-color: #000000;
+            border-right-color: #ffffff;
+            border-bottom-color: #ffffff;
         }
 
         .retro-btn-active {
-            background-color: #ffe082 !important;
+            background-color: #ffff00 !important;
+            color: #000 !important;
+            box-shadow: inset 3px 3px 0px #000 !important;
             transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0px #000;
         }
 
-        .btn-profile { background-color: #29b6f6; }
-        .btn-cabinet { background-color: #ff9800; }
-        .btn-plan { background-color: #76ff03; }
-        .btn-bookings { background-color: #ab47bc; color: #fff; }
-        .btn-admin { background-color: #ffd600; color: #000; }
-        .btn-help { background-color: #ef5350; color: #fff; }
+        .btn-profile { background-color: #00a8f3; }
+        .btn-cabinet { background-color: #ff7f27; }
+        .btn-plan { background-color: #22b14c; }
+        .btn-bookings { background-color: #a349a4; color: #fff; }
+        .btn-admin { background-color: #fff200; color: #000; }
+        .btn-help { background-color: #ed1c24; color: #fff; }
 
         /* CRT Toggle Box (Stage 7.1) */
         .crt-toggle-box {
             margin-top: 15px;
-            background: #fff;
-            border: var(--border-thick);
+            background: #c0c0c0;
+            border: 3px solid #000;
             padding: 8px 10px;
-            box-shadow: var(--shadow-retro);
+            box-shadow: 4px 4px 0px #000;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -233,47 +245,45 @@
             font-size: 13px;
         }
 
-        /* Dynamic Grid Backgrounds (Gentle notebook grid) */
+        /* Dynamic Grid Backgrounds (Authentic 90s Math Notebook Grid) */
         .main-workspace {
             flex: 1;
             padding: 20px 24px;
             display: flex;
             flex-direction: column;
-            transition: background-color 0.3s ease;
             overflow-y: auto;
             max-height: 100vh;
         }
 
         .grid-pattern-yellow {
-            background-color: #fffde7;
-            background-image: linear-gradient(rgba(0, 150, 255, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 150, 255, 0.12) 1px, transparent 1px);
-            background-size: 24px 24px;
+            background-color: #fff9bd;
+            background-image: linear-gradient(#b0c4de 1px, transparent 1px), linear-gradient(90deg, #b0c4de 1px, transparent 1px);
+            background-size: 20px 20px;
         }
         .grid-pattern-green {
-            background-color: #e8f5e9;
-            background-image: linear-gradient(rgba(46, 125, 50, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(46, 125, 50, 0.12) 1px, transparent 1px);
-            background-size: 24px 24px;
+            background-color: #d7ffd9;
+            background-image: linear-gradient(#2e7d32 1px, transparent 1px), linear-gradient(90deg, #2e7d32 1px, transparent 1px);
+            background-size: 20px 20px;
         }
         .grid-pattern-blue {
-            background-color: #e1f5fe;
-            background-image: linear-gradient(rgba(2, 136, 209, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(2, 136, 209, 0.12) 1px, transparent 1px);
-            background-size: 24px 24px;
+            background-color: #d0f0fd;
+            background-image: linear-gradient(#0288d1 1px, transparent 1px), linear-gradient(90deg, #0288d1 1px, transparent 1px);
+            background-size: 20px 20px;
         }
         .grid-pattern-pink {
-            background-color: #fce4ec;
-            background-image: linear-gradient(rgba(233, 30, 99, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(233, 30, 99, 0.12) 1px, transparent 1px);
-            background-size: 24px 24px;
+            background-color: #ffdbe8;
+            background-image: linear-gradient(#d81b60 1px, transparent 1px), linear-gradient(90deg, #d81b60 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
-        /* Speech Bubble (Clean comic balloon) */
+        /* Speech Bubble (Comic 90s Classroom Balloon) */
         .speech-bubble {
-            background-color: #fff;
-            border: var(--border-thick);
-            border-radius: 12px;
+            background-color: #ffffff;
+            border: 4px solid #000;
             padding: 10px 16px;
             font-size: 15px;
             font-weight: 900;
-            box-shadow: var(--shadow-retro);
+            box-shadow: 4px 4px 0px #000;
             flex: 1;
             position: relative;
             line-height: 1.35;
@@ -292,7 +302,7 @@
 
         /* Status Bar with Chalkboard Timer (Stage 5.2) */
         .status-bar {
-            border: var(--border-thick);
+            border: 4px solid #000;
             padding: 10px 18px;
             font-weight: 900;
             font-size: 17px;
@@ -300,8 +310,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: var(--shadow-retro);
-            background-color: #2e7d32;
+            box-shadow: 5px 5px 0px #000;
+            background-color: #1b5e20; /* Deep school chalkboard green */
             color: #fff;
             flex-wrap: wrap;
             gap: 10px;
@@ -1901,15 +1911,27 @@
 
             saveProfileBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                const name = nameInput.value.trim();
+                const rawName = nameInput.value.trim();
                 const group = groupInput.value.trim();
 
-                // Validate real name: must be at least 3 characters and not a placeholder
-                const placeholderRe = /^(test|user|admin|йцукен|тест|asdf|qwerty|\d+)$/i;
-                if (!name || name.length < 3 || placeholderRe.test(name)) {
+                // Strict First-Name Last-Name validation (at least 2 words, letters only, min 3 chars each)
+                const words = rawName.split(/\s+/).filter(w => w.length > 0);
+                const lettersOnlyRe = /^[a-zA-Zа-яА-ЯіІїЇєЄґҐ'-]+$/;
+                const profanityOrJunk = /^(какашка|лох|дурак|дебил|сука|хуй|пидор|test|admin|user|qwerty|asdf|йцукен|123)$/i;
+
+                if (words.length < 2) {
                     triggerBaldiEmotion('angry');
-                    updateBaldiSpeech("Увага! Вкажіть справжнє повне ім'я учня (не менше 3 літер без плейсхолдерів)!");
-                    alert("⚠️ Введіть справжнє ім'я учня (мінімум 3 літери)!");
+                    updateBaldiSpeech("Помилка! Введіть повне Ім'я та Прізвище (2 слова, наприклад: Тарас Шевченко)!");
+                    alert("⚠️ Введіть ПОВНЕ Ім'я та Прізвище (не менше двох слів)!");
+                    nameInput.focus();
+                    return;
+                }
+
+                const invalidWord = words.find(w => w.length < 3 || !lettersOnlyRe.test(w) || profanityOrJunk.test(w));
+                if (invalidWord) {
+                    triggerBaldiEmotion('angry');
+                    updateBaldiSpeech("Неприпустиме ім'я! Кожне слово має містити мінімум 3 літери без цифр та спаму!");
+                    alert("⚠️ Некоректне ім'я! Кожне слово (Ім'я та Прізвище) має складатися лише з літер (мінімум 3 літери)!");
                     nameInput.focus();
                     return;
                 }
@@ -1922,14 +1944,16 @@
                     return;
                 }
 
-                state.profile = { name: sanitizeHTML(name), group: sanitizeHTML(group) };
+                const cleanName = words.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+                state.profile = { name: sanitizeHTML(cleanName), group: sanitizeHTML(group) };
+                nameInput.value = cleanName;
                 safeSetJSON('freePC_profile', state.profile);
 
                 savedTag.classList.remove('hidden');
                 setTimeout(() => savedTag.classList.add('hidden'), 2500);
 
                 triggerBaldiEmotion('celebrate');
-                updateBaldiSpeech(`Чудово, ${state.profile.name}! Профіль (${state.profile.group}) успішно збережено. Обирай кабінет!`);
+                updateBaldiSpeech(`Чудово, ${state.profile.name}! Профіль (${state.profile.group}) успішно внесено до журналу. Обирай кабінет!`);
                 setTimeout(() => switchView('cabinet'), 700);
             });
 
