@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreePC – Baldi's Basics School Edition (Ultimate Upgrade)</title>
+    <style>
+        /* CSS Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif, cursive;
+            user-select: none;
+        }
+
+        :root {
+            --border-thick: 4px solid #000;
+            --shadow-retro: 4px 4px 0px #000;
+            --shadow-retro-lg: 6px 6px 0px #000;
+            --shadow-retro-press: 2px 2px 0px #000;
+        }
+
+        body {
+            background-color: #f0f0f0;
+            color: #000;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* CRT Filter Overlay (Stage 7.1) */
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 99999;
+            display: none;
+        }
+
+        body.crt-active .crt-overlay {
+            display: block;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+            background-size: 100% 4px, 6px 100%;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.45);
+        }
+
+        /* Layout Structure */
+        .app-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+            flex-direction: row;
+        }
+
+        @media (max-width: 900px) {
+            .app-container {
+                flex-direction: column;
+            }
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            background-color: #fff9c4;
+            border-right: 5px solid #000;
+            padding: 16px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 5px 0px 0px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 100%;
+                min-width: 100%;
+                border-right: none;
+                border-bottom: 5px solid #000;
+            }
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .main-title {
+            font-size: 28px;
+            font-weight: 900;
+            color: #d32f2f;
+            text-shadow: 2px 2px 0px #000;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            font-weight: bold;
+            background-color: #000;
+            color: #fff;
+            padding: 2px 8px;
+            display: inline-block;
+            margin-top: 5px;
+            border-radius: 3px;
+        }
+
+        /* Baldi Avatar & Speech Bubble (Compact Top Header, Stage 2.1 & 2.2) */
+        .baldi-header-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            width: 100%;
+        }
+
+        .baldi-avatar-wrapper {
+            width: 75px;
+            height: 85px;
+            min-width: 75px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: visible;
+        }
+
+        .baldi-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(3px 3px 0px rgba(0,0,0,0.45));
+            transition: transform 0.2s;
+            background: transparent;
+            mix-blend-mode: multiply;
+        }
+
+        /* Baldi Animation States (Stage 2.2) */
+        .baldi-talking {
+            animation: baldiTalk 0.5s infinite ease-in-out alternate;
+        }
+        @keyframes baldiTalk {
+            0% { transform: rotate(-3deg) translateY(0); }
+            100% { transform: rotate(3deg) translateY(-5px) scale(1.02); }
+        }
+
+        .baldi-celebrate {
+            animation: baldiJump 0.6s infinite ease-in-out;
+        }
+        @keyframes baldiJump {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-12px) scale(1.06) rotate(4deg); }
+        }
+
+        .baldi-angry {
+            animation: baldiRage 0.15s infinite alternate;
+            filter: drop-shadow(2px 2px 0px #d32f2f) !important;
+        }
+        @keyframes baldiRage {
+            0% { transform: translate(-4px, 0) rotate(-4deg); }
+            100% { transform: translate(4px, 0) rotate(4deg); }
+        }
+
+        /* Navigation Buttons */
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .retro-btn {
+            border: var(--border-thick);
+            box-shadow: var(--shadow-retro);
+            padding: 10px 14px;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.05s, box-shadow 0.05s;
+            background-color: #fff;
+            color: #000;
+        }
+
+        .retro-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-retro-lg);
+        }
+
+        .retro-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: var(--shadow-retro-press);
+        }
+
+        .retro-btn-active {
+            background-color: #ffe082 !important;
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        .btn-profile { background-color: #29b6f6; }
+        .btn-cabinet { background-color: #ff9800; }
+        .btn-plan { background-color: #76ff03; }
+        .btn-bookings { background-color: #ab47bc; color: #fff; }
+        .btn-admin { background-color: #ffd600; color: #000; }
+        .btn-help { background-color: #ef5350; color: #fff; }
+
+        /* CRT Toggle Box (Stage 7.1) */
+        .crt-toggle-box {
+            margin-top: 15px;
+            background: #fff;
+            border: var(--border-thick);
+            padding: 8px 10px;
+            box-shadow: var(--shadow-retro);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 900;
+            font-size: 13px;
+        }
+
+        /* Dynamic Grid Backgrounds (Gentle notebook grid) */
+        .main-workspace {
+            flex: 1;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .grid-pattern-yellow {
+            background-color: #fffde7;
+            background-image: linear-gradient(rgba(0, 150, 255, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 150, 255, 0.12) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .grid-pattern-green {
+            background-color: #e8f5e9;
+            background-image: linear-gradient(rgba(46, 125, 50, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(46, 125, 50, 0.12) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .grid-pattern-blue {
+            background-color: #e1f5fe;
+            background-image: linear-gradient(rgba(2, 136, 209, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(2, 136, 209, 0.12) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .grid-pattern-pink {
+            background-color: #fce4ec;
+            background-image: linear-gradient(rgba(233, 30, 99, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(233, 30, 99, 0.12) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Speech Bubble (Clean comic balloon) */
+        .speech-bubble {
+            background-color: #fff;
+            border: var(--border-thick);
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 15px;
+            font-weight: 900;
+            box-shadow: var(--shadow-retro);
+            flex: 1;
+            position: relative;
+            line-height: 1.35;
+        }
+
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            left: -16px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 8px;
+            border-style: solid;
+            border-color: transparent #000 transparent transparent;
+        }
+
+        /* Status Bar with Chalkboard Timer (Stage 5.2) */
+        .status-bar {
+            border: var(--border-thick);
+            padding: 10px 18px;
+            font-weight: 900;
+            font-size: 17px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-retro);
+            background-color: #2e7d32;
+            color: #fff;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .status-active {
+            background-color: #0288d1;
+        }
+
+        .timer-badge {
+            background: #000;
+            color: #76ff03;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 4px 10px;
+            border: 2px solid #fff;
+            border-radius: 4px;
+            font-size: 18px;
+            letter-spacing: 2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cancel-btn {
+            background-color: #d32f2f;
+            color: #fff;
+            border: 3px solid #000;
+            padding: 6px 14px;
+            font-weight: 900;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: var(--shadow-retro-press);
+        }
+
+        .cancel-btn:hover {
+            background-color: #b71c1c;
+        }
+
+        /* Content Card Boxes (Stage 7.2) */
+        .card-box {
+            background-color: #fff;
+            border: var(--border-thick);
+            padding: 24px;
+            box-shadow: var(--shadow-retro-lg);
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 900;
+            border-bottom: var(--border-thick);
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Classroom Chalkboard (Stage 5.2 & 6.1) */
+        .school-board {
+            background-color: #1b5e20;
+            color: #fff;
+            text-align: center;
+            padding: 12px 15px;
+            font-weight: 900;
+            border: var(--border-thick);
+            margin-bottom: 18px;
+            box-shadow: var(--shadow-retro);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+        }
+        .school-board:hover {
+            border-color: #ffd600;
+        }
+
+        /* 2D Interactive Classroom Layout (Stage 3.1 & 3.2) */
+        .classroom-map-container {
+            background: #fffde7;
+            border: var(--border-thick);
+            box-shadow: var(--shadow-retro);
+            padding: 20px;
+            position: relative;
+            min-height: 480px;
+            overflow: auto;
+        }
+
+        .room-walls {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 3px dashed #795548;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .room-element {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #ffe082;
+            border: 2px solid #000;
+            padding: 4px 10px;
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        .teacher-podium {
+            background: #ffb74d;
+            border: 3px solid #000;
+            padding: 10px 18px;
+            box-shadow: 3px 3px 0 #000;
+            font-weight: 900;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .teacher-ruler-icon {
+            background: #ffb300;
+            border: 2px solid #000;
+            padding: 2px 6px;
+            transform: rotate(-15deg);
+        }
+
+        /* Desk Rows Grid (Clean 4x2 / 3x2 Classroom Desk Rows) */
+        .desk-rows-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        @media (max-width: 1100px) {
+            .desk-rows-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .desk-rows-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Detailed 2D PC Station (Stage 3.2) */
+        .pc-station {
+            background: #c8e6c9;
+            border: var(--border-thick);
+            box-shadow: var(--shadow-retro);
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 160px;
+        }
+
+        .pc-station:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-retro-lg);
+        }
+
+        .pc-station.status-free {
+            background: #a5d6a7;
+            border-color: #2e7d32;
+        }
+
+        .pc-station.status-occupied {
+            background: #ef9a9a;
+            border-color: #c62828;
+            cursor: not-allowed;
+        }
+
+        .pc-station.status-mine {
+            background: #fff59d;
+            border-color: #f57f17;
+            animation: pulseActive 1.2s infinite alternate;
+        }
+        @keyframes pulseActive {
+            0% { box-shadow: 4px 4px 0px #f57f17; transform: scale(1); }
+            100% { box-shadow: 6px 6px 12px #ffb300; transform: scale(1.03); }
+        }
+
+        .pc-station.status-repair {
+            background: #e0e0e0;
+            border-color: #616161;
+            filter: grayscale(1);
+            cursor: not-allowed;
+        }
+
+        .pc-station.software-matched {
+            outline: 4px dashed #ff1744;
+            animation: bounceMatch 0.8s infinite alternate;
+        }
+        @keyframes bounceMatch {
+            0% { outline-offset: 2px; }
+            100% { outline-offset: 6px; }
+        }
+
+        /* PC Pixel Monitor Art */
+        .monitor-art {
+            width: 70px;
+            height: 52px;
+            background: #37474f;
+            border: 3px solid #000;
+            border-radius: 4px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.6);
+        }
+        .monitor-screen {
+            width: 54px;
+            height: 36px;
+            background: #80deea;
+            border: 2px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .monitor-stand {
+            width: 24px;
+            height: 8px;
+            background: #78909c;
+            border: 2px solid #000;
+            border-top: none;
+            margin: 0 auto;
+        }
+        .monitor-base {
+            width: 44px;
+            height: 6px;
+            background: #546e7a;
+            border: 2px solid #000;
+            margin: 0 auto 6px auto;
+        }
+
+        .pc-desk-peripherals {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 900;
+            background: rgba(0,0,0,0.06);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        /* Filter & Search Bar (Stage 4.2) */
+        .filter-panel {
+            background: #ffe082;
+            border: var(--border-thick);
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-retro);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 900;
+            font-size: 15px;
+        }
+
+        /* Forms & Inputs */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 900;
+            margin-bottom: 6px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            border: var(--border-thick);
+            padding: 10px 12px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #fffde7;
+            outline: none;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            background-color: #fff;
+            border-color: #ff9800;
+        }
+
+        /* Modal Dialogs (Stage 4.1) */
+        .retro-modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .retro-modal {
+            background: #fff;
+            border: 5px solid #000;
+            box-shadow: 8px 8px 0 #000;
+            padding: 24px;
+            width: 90%;
+            max-width: 580px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .modal-close-btn {
+            background: #d32f2f;
+            color: #fff;
+            border: 3px solid #000;
+            font-size: 18px;
+            font-weight: 900;
+            width: 34px;
+            height: 34px;
+            cursor: pointer;
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        /* Specs Table */
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            border: 3px solid #000;
+        }
+        .specs-table td {
+            border: 2px solid #000;
+            padding: 8px 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .specs-table td:first-child {
+            background: #fff9c4;
+            width: 35%;
+        }
+
+        .software-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 5px;
+        }
+        .sw-tag {
+            background: #e1f5fe;
+            border: 2px solid #000;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 900;
+            border-radius: 4px;
+        }
+
+        /* Admin Layout Grid Editor (Stage 3.3 & 6.2) */
+        .admin-canvas-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            background: #e0f2f1;
+            border: var(--border-thick);
+            padding: 15px;
+            min-height: 250px;
+        }
+        .admin-slot {
+            background: #fff;
+            border: 3px dashed #000;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .admin-slot.has-pc {
+            border-style: solid;
+            background: #a5d6a7;
+        }
+
+        /* Legend */
+        .status-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 15px;
+            font-size: 13px;
+            font-weight: 900;
+            background: #f5f5f5;
+            padding: 8px 12px;
+            border: 2px solid #000;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border: 2px solid #000;
+            display: inline-block;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CRT TV Screen Effect Overlay (Stage 7.1) -->
+    <div class="crt-overlay" id="crtOverlay"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div>
+                <div class="sidebar-header">
+                    <h1 class="main-title">FreePC System</h1>
+                    <span class="subtitle">BALDI'S BASICS SCHOOL LAB</span>
+                </div>
+
+                <!-- Nav Menu -->
+                <nav class="nav-menu">
+                    <button class="retro-btn btn-profile nav-tab retro-btn-active" data-target="profile">
+                        <span>Профіль</span> <span>👤</span>
+                    </button>
+                    <button class="retro-btn btn-cabinet nav-tab" data-target="cabinet">
+                        <span>Вибір кабінету</span> <span>🏫</span>
+                    </button>
+                    <button class="retro-btn btn-plan nav-tab" data-target="plan">
+                        <span>2D План класу</span> <span>🖥️</span>
+                    </button>
+                    <button class="retro-btn btn-bookings nav-tab" data-target="bookings">
+                        <span>Мої бронювання</span> <span>📋</span>
+                    </button>
+                    <button class="retro-btn btn-help nav-tab" data-target="help">
+                        <span>Довідка & Правила</span> <span>❓</span>
+                    </button>
+                    <button class="retro-btn btn-admin nav-tab" id="adminSecretBtn" data-target="admin">
+                        <span>Режим вчителя</span> <span>🔑</span>
+                    </button>
+                </nav>
+            </div>
+
+            <div>
+                <!-- CRT Switcher (Stage 7.1) -->
+                <div class="crt-toggle-box">
+                    <span>📺 Ефект CRT-монітора:</span>
+                    <button type="button" id="crtToggleBtn" class="retro-btn" style="padding: 4px 10px; font-size: 13px;">
+                        ВКЛ / ВИКЛ
+                    </button>
+                </div>
+
+                <div style="text-align: center; font-size: 12px; font-weight: bold; margin-top: 15px; border-top: 2px dashed #000; padding-top: 6px;">
+                    © FreePC Baldi 1999 • Школа №101
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <main class="main-workspace grid-pattern-yellow" id="mainWorkspace">
+
+            <!-- Baldi Dynamic Avatar & Speech Bubble (Side-by-side Top Header) -->
+            <div class="baldi-header-container">
+                <div class="baldi-avatar-wrapper" id="baldiBox" title="Вчитель Балді">
+                    <img id="baldiImg" class="baldi-img" src="baldi.png" alt="Baldi Teacher with Ruler">
+                </div>
+                <div class="speech-bubble" id="baldiSpeech">
+                    Ласкаво просимо до комп'ютерного класу! Заповни свій профіль, візьми лінійку та починай!
+                </div>
+            </div>
+
+            <!-- Global Status Bar with Realtime Chalkboard Timer (Stage 5.2) -->
+            <div class="status-bar" id="statusBar">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span id="statusText">Немає активного бронювання</span>
+                    <span id="sessionTimerDisplay" class="timer-badge hidden">⏳ 00:00</span>
+                </div>
+                <button class="cancel-btn hidden" id="cancelBookingBtn">Звільнити ПК</button>
+            </div>
+
+            <!-- ================= SECTIONS ================= -->
+
+            <!-- 1. PROFILE VIEW -->
+            <section id="profileView" class="view-section card-box">
+                <h2 class="section-title">
+                    <span>Профіль учня</span>
+                    <span>✏️</span>
+                </h2>
+                <div class="form-group">
+                    <label class="form-label">Ім'я та Прізвище:</label>
+                    <input type="text" id="nameInput" class="form-input" placeholder="Введіть повне ім'я...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Група / Клас:</label>
+                    <input type="text" id="groupInput" class="form-input" placeholder="Наприклад: КІ-22 або 10-А...">
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px; margin-top: 20px;">
+                    <button type="button" id="saveProfileBtn" class="retro-btn btn-profile" style="background-color: #ec407a; color: #fff;">
+                        Зберегти профіль
+                    </button>
+                    <span id="savedTag" class="hidden" style="color: #2e7d32; font-weight: 900;">✓ Збережено успішно!</span>
+                </div>
+            </section>
+
+            <!-- 2. CABINET SELECTION VIEW -->
+            <section id="cabinetView" class="view-section card-box hidden">
+                <h2 class="section-title">
+                    <span>Вибір кабінету</span>
+                    <span>🏫</span>
+                </h2>
+                <div class="form-group">
+                    <label class="form-label">Оберіть комп'ютерний клас:</label>
+                    <select id="cabinetSelect" class="form-select">
+                        <option value="101">Кабінет 101 – Головна лабораторія Baldi (Готово 2D)</option>
+                        <option value="102">Кабінет 102 – IT & Програмування (Готово 2D)</option>
+                        <option value="104">Кабінет 104 – Комп'ютерний клас робототехніки</option>
+                        <option value="208">Кабінет 208 – Мультимедійний зал</option>
+                    </select>
+                </div>
+
+                <div style="background: #fff9c4; border: 3px solid #000; padding: 12px; margin-bottom: 20px; font-weight: bold; font-size: 14px;">
+                    💡 <strong>Порада викладача:</strong> Кабінети 101 та 102 повністю розкреслені та доступні в 2D-режимі. Для кабінетів без затвердженої схеми діє автоматична система ручного бронювання!
+                </div>
+
+                <button type="button" id="goToPlanBtn" class="retro-btn btn-cabinet" style="font-size: 18px;">
+                    Відкрити 2D-план класу ➔
+                </button>
+            </section>
+
+            <!-- 3. CLASSROOM 2D PLAN VIEW (Stage 3.1 & 3.2) -->
+            <section id="planView" class="view-section card-box hidden" style="width: 100%; max-width: 100%;">
+                <div class="section-title">
+                    <span>Інтерактивний 2D План: Кабінет <span id="cabinetTitle">101</span></span>
+                    <span style="font-size: 16px; background: #000; color: #fff; padding: 2px 8px;">2D Top-Down</span>
+                </div>
+
+                <!-- Green Chalkboard with Secret Admin Trigger (Stage 5.2 & 6.1) -->
+                <div class="school-board" id="schoolChalkboard" title="Подвійний клік відкриває панель викладача!">
+                    <div>📐 ШКІЛЬНА ДОШКА ВИКЛАДАЧА БАЛДІ 📐</div>
+                    <div id="boardChalkTimer" style="font-family:'Courier New', monospace; font-size: 20px; color:#ffff72;">
+                        СЕАНС: НЕ АКТИВНИЙ
+                    </div>
+                </div>
+
+                <!-- Search & Software Filter Panel (Stage 4.2) -->
+                <div class="filter-panel">
+                    <div class="filter-group">
+                        <span>🔍 Фільтр софту:</span>
+                        <select id="softwareFilterSelect" class="form-select" style="width: auto; padding: 6px 10px; font-size: 14px;">
+                            <option value="all">Усі комп'ютери</option>
+                            <option value="VS Code">VS Code</option>
+                            <option value="Python">Python 3.12</option>
+                            <option value="C++">C++ (GCC/Clang)</option>
+                            <option value="Blender">Blender 4.0</option>
+                            <option value="Cisco Packet Tracer">Cisco Packet Tracer</option>
+                            <option value="Photoshop">Adobe Photoshop</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <button type="button" id="resetFilterBtn" class="retro-btn" style="padding: 4px 10px; font-size: 13px;">
+                            Скинути фільтр
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2D Room Classroom Map -->
+                <div class="classroom-map-container" id="classroomMapContainer">
+                    <div class="room-walls">
+                        <div class="room-element">🚪 Вхідні двері (Каб. <span id="roomDoorNum">101</span>)</div>
+                        <div class="room-element">🪟 Вікна аудиторії (Вид на шкільне подвір'я)</div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div class="teacher-podium">
+                            <span class="teacher-ruler-icon">📏</span>
+                            <span>Стіл Вчителя (Baldi's Desk & Ruler)</span>
+                        </div>
+                        <div style="font-size: 12px; font-weight: 900; background: #fff; border: 2px solid #000; padding: 4px 8px;">
+                            🟢 Клік по ПК відкриває характеристики та слоти
+                        </div>
+                    </div>
+
+                    <!-- PC Stations Desk Rows -->
+                    <div class="desk-rows-grid" id="deskRowsGrid">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- Legend of PC States (Stage 3.2) -->
+                <div class="status-legend">
+                    <div class="legend-item"><span class="legend-dot" style="background:#a5d6a7;"></span> 🟢 Вільний для броні</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#ef9a9a;"></span> 🔴 Зайнятий студентом</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#fff59d;"></span> 🟡 Твій заброньований ПК (пульсує)</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#e0e0e0;"></span> ⚪ На ремонті (Out of Order)</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#ff1744;"></span> 🔴 Пунктир: підходить за фільтром ПЗ</div>
+                </div>
+            </section>
+
+            <!-- 4. MY BOOKINGS VIEW -->
+            <section id="bookingsView" class="view-section card-box hidden">
+                <h2 class="section-title">
+                    <span>Мої Бронювання</span>
+                    <span>📋</span>
+                </h2>
+                <div id="bookingCardContent">
+                    <!-- Populated via JS -->
+                </div>
+            </section>
+
+            <!-- 5. HELP VIEW -->
+            <section id="helpView" class="view-section card-box hidden">
+                <h2 class="section-title">
+                    <span>Довідка та Правила Аудиторій</span>
+                    <span>❓</span>
+                </h2>
+                <div style="background-color: #fff9c4; border: 3px solid #000; padding: 15px; margin-bottom: 15px;">
+                    <h3 style="font-weight: 900; color: #c62828; margin-bottom: 8px;">📌 Як забронювати комп'ютер?</h3>
+                    <p>1. Вкажіть ім'я та групу у вкладці «Профіль».</p>
+                    <p>2. Оберіть розкреслений кабінет (наприклад, 101 або 102).</p>
+                    <p>3. Натисніть на зелений ПК на 2D-плані, оберіть тривалість сеансу (45 хв або пару) і підтвердіть бронювання.</p>
+                </div>
+                <div style="background-color: #e1f5fe; border: 3px solid #000; padding: 15px; margin-bottom: 15px;">
+                    <h3 style="font-weight: 900; color: #0277bd; margin-bottom: 8px;">⏱️ Правило 1 ПК та Авто-скасування</h3>
+                    <p>Кожен студент може займати лише <strong>один ПК одночасно</strong>.</p>
+                    <p>Коли таймер сеансу завершується, комп'ютер автоматично звільняється, щоб інші учні могли продовжити навчання!</p>
+                </div>
+                <div style="background-color: #e8f5e9; border: 3px solid #000; padding: 15px;">
+                    <h3 style="font-weight: 900; color: #2e7d32; margin-bottom: 8px;">🔑 Секретний режим вчителя</h3>
+                    <p>Подвійний клік на шкільну дошку або клік по кнопці «Режим вчителя» у меню відкриває адмін-панель (пароль за замовчуванням: <code>baldi</code> або <code>1234</code>).</p>
+                </div>
+            </section>
+
+            <!-- 6. FALLBACK MANUAL REQUEST VIEW (Stage 3.1 & 3.3) -->
+            <section id="manualRequestView" class="view-section card-box hidden">
+                <h2 class="section-title" style="color: #c62828;">
+                    <span>⚠️ Кабінет ще не розкреслений!</span>
+                    <span>📝</span>
+                </h2>
+                <div style="background-color: #ffebee; border: 3px solid #b71c1c; padding: 15px; margin-bottom: 20px;">
+                    <p style="font-weight: 900; font-size: 17px; color: #b71c1c;">
+                        Адміністратор ще не створив 2D-схему для кабінету <span id="unmappedCabName">---</span>!
+                    </p>
+                    <p style="margin-top: 6px; font-weight: bold;">
+                        Не хвилюйся! Заповни форму ручного бронювання нижче, і черговий викладач призначить тобі ПК вручну.
+                    </p>
+                </div>
+
+                <form id="manualBookingForm">
+                    <div class="form-group">
+                        <label class="form-label">Студент:</label>
+                        <input type="text" id="manualStudentInput" class="form-input" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Бажаний кабінет:</label>
+                        <input type="text" id="manualCabinetInput" class="form-input" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Необхідне ПЗ для роботи:</label>
+                        <input type="text" id="manualSoftwareInput" class="form-input" placeholder="Наприклад: Blender, Packet Tracer, GCC...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Бажаний час або пара:</label>
+                        <select id="manualTimeSlotSelect" class="form-select">
+                            <option value="08:30 - 10:05 (1 пара)">08:30 - 10:05 (1 пара)</option>
+                            <option value="10:20 - 11:55 (2 пара)">10:20 - 11:55 (2 пара)</option>
+                            <option value="12:10 - 13:45 (3 пара)">12:10 - 13:45 (3 пара)</option>
+                            <option value="14:00 - 15:35 (4 пара)">14:00 - 15:35 (4 пара)</option>
+                            <option value="45 хвилин">Експрес-сеанс (45 хв)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Додаткові коментарі / Побажання:</label>
+                        <textarea id="manualCommentInput" class="form-textarea" rows="3" placeholder="Опишіть спеціальні вимоги до ПК..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        <button type="submit" class="retro-btn" style="background: #2e7d32; color: #fff;">
+                            Надіслати заявку вчителю ➔
+                        </button>
+                        <button type="button" id="cancelManualBtn" class="retro-btn">
+                            Повернутися назад
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- 7. TEACHER / ADMIN PANEL VIEW (Stage 6) -->
+            <section id="adminView" class="view-section card-box hidden" style="width: 100%; max-width: 100%;">
+                <div class="section-title" style="color: #d32f2f;">
+                    <span>👨‍🏫 Секретна Панель Вчителя Балді</span>
+                    <span>🔒 ADMIN</span>
+                </div>
+
+                <!-- Admin Auth Box -->
+                <div id="adminAuthBox" style="background: #fff9c4; border: 3px solid #000; padding: 20px; text-align: center;">
+                    <h3 style="font-weight: 900; margin-bottom: 10px;">Введіть пароль викладача для доступу:</h3>
+                    <div style="display: flex; justify-content: center; gap: 10px; max-width: 380px; margin: 0 auto;">
+                        <input type="password" id="adminPasswordInput" class="form-input" placeholder="Пароль...">
+                        <button type="button" id="adminLoginBtn" class="retro-btn btn-admin">Увійти</button>
+                    </div>
+                    <div id="adminAuthError" class="hidden" style="color: #d32f2f; font-weight: 900; margin-top: 10px;">
+                        Невірний пароль! Балді незадоволений і ляскає лінійкою! 📏
+                    </div>
+                </div>
+
+                <!-- Admin Dashboard -->
+                <div id="adminDashboardBox" class="hidden">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                        <div style="font-weight: 900; font-size: 18px; color: #2e7d32;">
+                            ✓ Режим викладача активний! Доступні повні права.
+                        </div>
+                        <button type="button" id="adminLogoutBtn" class="retro-btn" style="padding: 4px 10px; font-size: 13px; background: #e0e0e0;">
+                            Вийти з режиму
+                        </button>
+                    </div>
+
+                    <!-- Quick Global Action Buttons (Stage 6.2) -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 25px;">
+                        <button type="button" id="adminClearAllBookingsBtn" class="retro-btn" style="background: #d32f2f; color: #fff;">
+                            🗑️ Очистити ВСІ бронювання в школі
+                        </button>
+                        <button type="button" id="adminResetDefaultLayoutsBtn" class="retro-btn" style="background: #0288d1; color: #fff;">
+                            🔄 Відновити дефолтні кабінети 101/102
+                        </button>
+                    </div>
+
+                    <!-- Current Active Students List (Stage 6.2) -->
+                    <div style="background: #f1f8e9; border: 3px solid #000; padding: 15px; margin-bottom: 25px;">
+                        <h3 style="font-weight: 900; margin-bottom: 10px;">📋 Студенти за комп'ютерами зараз:</h3>
+                        <div id="adminOccupiedList">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Layout Builder & Classroom Editor (Stage 3.3 & 6.2) -->
+                    <div style="background: #e8eaf6; border: 3px solid #000; padding: 18px;">
+                        <h3 style="font-weight: 900; margin-bottom: 12px;">✏️ Конструктор та статус кабінетів:</h3>
+                        
+                        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 15px; flex-wrap: wrap;">
+                            <label class="form-label" style="margin-bottom: 0;">Оберіть кабінет для редагування:</label>
+                            <select id="adminClassroomSelect" class="form-select" style="width: auto;">
+                                <option value="101">Кабінет 101 (Головна лабораторія)</option>
+                                <option value="102">Кабінет 102 (IT & Програмування)</option>
+                                <option value="104">Кабінет 104 (Робототехніка)</option>
+                                <option value="208">Кабінет 208 (Мультимедіа)</option>
+                            </select>
+
+                            <button type="button" id="adminTogglePublishBtn" class="retro-btn" style="background: #76ff03;">
+                                Опубліковано ✓ (Змінити)
+                            </button>
+                        </div>
+
+                        <p style="font-size: 14px; font-weight: bold; margin-bottom: 12px;">
+                            Клікніть по місцю ПК нижче, щоб додати комп'ютер, перемкнути статус «На ремонті» або видалити:
+                        </p>
+
+                        <!-- Admin Classroom Grid Slots -->
+                        <div class="admin-canvas-grid" id="adminCanvasGrid">
+                            <!-- Slots generated via JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- PC Details & Booking Modal (Stage 4.1 & 5.1) -->
+    <div id="pcDetailsModal" class="retro-modal-backdrop hidden">
+        <div class="retro-modal">
+            <div class="modal-header">
+                <h3 style="font-weight: 900; font-size: 20px;">
+                    🖥️ Специфікація ПК #<span id="modalPcNum">1</span> (<span id="modalCabNum">101</span>)
+                </h3>
+                <button type="button" class="modal-close-btn" id="closePcModalBtn">✕</button>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 15px;">
+                <div id="modalStatusBadge" style="display: inline-block; padding: 6px 14px; font-weight: 900; border: 3px solid #000; font-size: 16px;">
+                    🟢 Доступний для бронювання
+                </div>
+            </div>
+
+            <!-- Hardware Specs -->
+            <table class="specs-table">
+                <tr>
+                    <td>Процесор (CPU):</td>
+                    <td id="modalCpu">Intel Core i5-12400F (6 ядер, до 4.4 GHz)</td>
+                </tr>
+                <tr>
+                    <td>Оперативна пам'ять:</td>
+                    <td id="modalRam">16 GB DDR4-3200 MHz</td>
+                </tr>
+                <tr>
+                    <td>Відеокарта (GPU):</td>
+                    <td id="modalGpu">NVIDIA GeForce RTX 3060 12GB</td>
+                </tr>
+                <tr>
+                    <td>Накопичувач:</td>
+                    <td id="modalStorage">512 GB NVMe M.2 SSD</td>
+                </tr>
+            </table>
+
+            <!-- Software Installed (Stage 4.1) -->
+            <div style="margin: 15px 0;">
+                <span class="form-label">Встановлене програмне забезпечення:</span>
+                <div class="software-tags" id="modalSoftwareTags">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- Booking Slot Options (Stage 5.1) -->
+            <div id="bookingActionBox" style="background: #fffde7; border: 3px solid #000; padding: 15px; margin-top: 15px;">
+                <div class="form-group">
+                    <label class="form-label">Оберіть тривалість сеансу:</label>
+                    <select id="sessionDurationSelect" class="form-select">
+                        <option value="45">Експрес-робота (45 хвилин)</option>
+                        <option value="90">1 Пара: 08:30 - 10:05 (90 хвилин)</option>
+                        <option value="95">2 Пара: 10:20 - 11:55 (95 хвилин)</option>
+                        <option value="90">3 Пара: 12:10 - 13:45 (90 хвилин)</option>
+                        <option value="20">Короткий тест (20 секунд для перевірки авто-скидання)</option>
+                    </select>
+                </div>
+
+                <button type="button" id="confirmBookingBtn" class="retro-btn" style="background: #2e7d32; color: #fff; width: 100%; text-align: center; justify-content: center; font-size: 18px;">
+                    Забронювати цей ПК зараз ➔
+                </button>
+            </div>
+
+            <!-- Out of Order or Occupied Notice -->
+            <div id="modalNoticeBox" class="hidden" style="background: #ffcdd2; border: 3px solid #000; padding: 12px; font-weight: bold; text-align: center; margin-top: 15px;">
+                Бронювання неможливе.
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT APP LOGIC ================= -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            /* =========================================================
+               1. DATA REPOSITORY & SAFE LOCALSTORAGE (Stage 1.1)
+               ========================================================= */
+            function safeGetJSON(key, defaultValue) {
+                try {
+                    const val = localStorage.getItem(key);
+                    if (!val) return defaultValue;
+                    return JSON.parse(val);
+                } catch (e) {
+                    console.warn(`[SafeStorage] Помилка читання JSON для ${key}, відновлюємо дефолтні дані:`, e);
+                    localStorage.removeItem(key);
+                    return defaultValue;
+                }
+            }
+
+            function safeSetJSON(key, value) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(value));
+                } catch (e) {
+                    console.error(`[SafeStorage] Помилка запису в localStorage для ${key}:`, e);
+                }
+            }
+
+            // Pre-configured Default Classroom Layouts (Stage 3.3)
+            const DEFAULT_CLASSROOMS = {
+                '101': {
+                    name: "Кабінет 101 – Головна лабораторія Baldi",
+                    published: true,
+                    totalPcs: 8,
+                    pcs: [
+                        { id: 1, cpu: "Intel Core i5-12400F", ram: "16 GB DDR4", gpu: "RTX 3060 12GB", software: ["VS Code", "Python", "C++", "Blender"], repair: false },
+                        { id: 2, cpu: "Intel Core i5-12400F", ram: "16 GB DDR4", gpu: "RTX 3060 12GB", software: ["VS Code", "Python", "Cisco Packet Tracer"], repair: false },
+                        { id: 3, cpu: "AMD Ryzen 5 5600", ram: "16 GB DDR4", gpu: "GTX 1660 Super", software: ["VS Code", "Python", "Photoshop"], repair: false },
+                        { id: 4, cpu: "AMD Ryzen 5 5600", ram: "16 GB DDR4", gpu: "GTX 1660 Super", software: ["VS Code", "C++", "Cisco Packet Tracer"], repair: false },
+                        { id: 5, cpu: "Intel Core i7-11700", ram: "32 GB DDR4", gpu: "RTX 3070 8GB", software: ["VS Code", "Python", "Blender", "C++"], repair: false },
+                        { id: 6, cpu: "Intel Core i7-11700", ram: "32 GB DDR4", gpu: "RTX 3070 8GB", software: ["Blender", "Photoshop", "VS Code"], repair: false },
+                        { id: 7, cpu: "Intel Core i3-10100", ram: "8 GB DDR4", gpu: "Intel UHD 630", software: ["VS Code", "Python"], repair: true },
+                        { id: 8, cpu: "AMD Ryzen 5 3600", ram: "16 GB DDR4", gpu: "RX 580 8GB", software: ["VS Code", "Cisco Packet Tracer", "Python"], repair: false }
+                    ]
+                },
+                '102': {
+                    name: "Кабінет 102 – IT & Програмування",
+                    published: true,
+                    totalPcs: 6,
+                    pcs: [
+                        { id: 1, cpu: "Intel Core i5-13400", ram: "32 GB DDR5", gpu: "RTX 4060 8GB", software: ["VS Code", "Python", "C++", "Blender"], repair: false },
+                        { id: 2, cpu: "Intel Core i5-13400", ram: "32 GB DDR5", gpu: "RTX 4060 8GB", software: ["VS Code", "Python", "C++", "Cisco Packet Tracer"], repair: false },
+                        { id: 3, cpu: "AMD Ryzen 7 5700X", ram: "32 GB DDR4", gpu: "RTX 3060 Ti", software: ["VS Code", "Python", "Blender"], repair: false },
+                        { id: 4, cpu: "AMD Ryzen 7 5700X", ram: "32 GB DDR4", gpu: "RTX 3060 Ti", software: ["VS Code", "C++", "Photoshop"], repair: false },
+                        { id: 5, cpu: "Intel Core i5-11400", ram: "16 GB DDR4", gpu: "GTX 1650 4GB", software: ["VS Code", "Python"], repair: false },
+                        { id: 6, cpu: "Intel Core i5-11400", ram: "16 GB DDR4", gpu: "GTX 1650 4GB", software: ["VS Code", "Cisco Packet Tracer"], repair: false }
+                    ]
+                },
+                '104': {
+                    name: "Кабінет 104 – Робототехніка",
+                    published: false,
+                    totalPcs: 4,
+                    pcs: []
+                },
+                '208': {
+                    name: "Кабінет 208 – Мультимедійний зал",
+                    published: false,
+                    totalPcs: 8,
+                    pcs: []
+                }
+            };
+
+            // Global State
+            let state = {
+                profile: safeGetJSON('freePC_profile', { name: '', group: '' }),
+                booking: safeGetJSON('freePC_booking', null),
+                classrooms: safeGetJSON('freePC_classrooms', DEFAULT_CLASSROOMS),
+                occupiedPcs: safeGetJSON('freePC_occupiedPcs', {
+                    '101': { 2: { student: 'Олександр К.', group: 'КІ-21' } },
+                    '102': { 3: { student: 'Марія В.', group: 'ІПЗ-22' } }
+                }),
+                activeCabinet: '101',
+                currentView: 'profile',
+                crtEnabled: safeGetJSON('freePC_crt', false),
+                adminUnlocked: false,
+                activeFilterSoftware: 'all',
+                selectedModalPc: null
+            };
+
+            // Ensure classrooms are synced if new defaults were added
+            if (!state.classrooms['101'] || !state.classrooms['102']) {
+                state.classrooms = JSON.parse(JSON.stringify(DEFAULT_CLASSROOMS));
+                safeSetJSON('freePC_classrooms', state.classrooms);
+            }
+
+            const gridStyles = ['grid-pattern-yellow', 'grid-pattern-green', 'grid-pattern-blue', 'grid-pattern-pink'];
+            let currentGridIndex = 0;
+
+            // DOM Elements
+            const mainWorkspace = document.getElementById('mainWorkspace');
+            const baldiSpeech = document.getElementById('baldiSpeech');
+            const baldiImg = document.getElementById('baldiImg');
+            const statusBar = document.getElementById('statusBar');
+            const statusText = document.getElementById('statusText');
+            const sessionTimerDisplay = document.getElementById('sessionTimerDisplay');
+            const cancelBookingBtn = document.getElementById('cancelBookingBtn');
+            const nameInput = document.getElementById('nameInput');
+            const groupInput = document.getElementById('groupInput');
+            const saveProfileBtn = document.getElementById('saveProfileBtn');
+            const savedTag = document.getElementById('savedTag');
+            const cabinetSelect = document.getElementById('cabinetSelect');
+            const goToPlanBtn = document.getElementById('goToPlanBtn');
+            const cabinetTitle = document.getElementById('cabinetTitle');
+            const roomDoorNum = document.getElementById('roomDoorNum');
+            const schoolChalkboard = document.getElementById('schoolChalkboard');
+            const boardChalkTimer = document.getElementById('boardChalkTimer');
+            const deskRowsGrid = document.getElementById('deskRowsGrid');
+            const softwareFilterSelect = document.getElementById('softwareFilterSelect');
+            const resetFilterBtn = document.getElementById('resetFilterBtn');
+            const bookingCardContent = document.getElementById('bookingCardContent');
+            const crtToggleBtn = document.getElementById('crtToggleBtn');
+            const crtOverlay = document.getElementById('crtOverlay');
+            const navTabs = document.querySelectorAll('.nav-tab');
+            const viewSections = document.querySelectorAll('.view-section');
+
+            // Modal Elements
+            const pcDetailsModal = document.getElementById('pcDetailsModal');
+            const closePcModalBtn = document.getElementById('closePcModalBtn');
+            const modalPcNum = document.getElementById('modalPcNum');
+            const modalCabNum = document.getElementById('modalCabNum');
+            const modalStatusBadge = document.getElementById('modalStatusBadge');
+            const modalCpu = document.getElementById('modalCpu');
+            const modalRam = document.getElementById('modalRam');
+            const modalGpu = document.getElementById('modalGpu');
+            const modalStorage = document.getElementById('modalStorage');
+            const modalSoftwareTags = document.getElementById('modalSoftwareTags');
+            const bookingActionBox = document.getElementById('bookingActionBox');
+            const modalNoticeBox = document.getElementById('modalNoticeBox');
+            const sessionDurationSelect = document.getElementById('sessionDurationSelect');
+            const confirmBookingBtn = document.getElementById('confirmBookingBtn');
+
+            // Admin Elements
+            const adminSecretBtn = document.getElementById('adminSecretBtn');
+            const adminAuthBox = document.getElementById('adminAuthBox');
+            const adminDashboardBox = document.getElementById('adminDashboardBox');
+            const adminPasswordInput = document.getElementById('adminPasswordInput');
+            const adminLoginBtn = document.getElementById('adminLoginBtn');
+            const adminAuthError = document.getElementById('adminAuthError');
+            const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+            const adminClearAllBookingsBtn = document.getElementById('adminClearAllBookingsBtn');
+            const adminResetDefaultLayoutsBtn = document.getElementById('adminResetDefaultLayoutsBtn');
+            const adminOccupiedList = document.getElementById('adminOccupiedList');
+            const adminClassroomSelect = document.getElementById('adminClassroomSelect');
+            const adminTogglePublishBtn = document.getElementById('adminTogglePublishBtn');
+            const adminCanvasGrid = document.getElementById('adminCanvasGrid');
+
+            // Manual Request Form Elements
+            const unmappedCabName = document.getElementById('unmappedCabName');
+            const manualStudentInput = document.getElementById('manualStudentInput');
+            const manualCabinetInput = document.getElementById('manualCabinetInput');
+            const manualBookingForm = document.getElementById('manualBookingForm');
+            const cancelManualBtn = document.getElementById('cancelManualBtn');
+
+            // Populate form if profile data exists
+            if (state.profile.name) nameInput.value = state.profile.name;
+            if (state.profile.group) groupInput.value = state.profile.group;
+
+            /* =========================================================
+               2. CRT EFFECT SYSTEM (Stage 7.1)
+               ========================================================= */
+            function setCrtState(enabled) {
+                state.crtEnabled = enabled;
+                safeSetJSON('freePC_crt', enabled);
+                if (enabled) {
+                    document.body.classList.add('crt-active');
+                    crtToggleBtn.textContent = 'CRT: ON 🟢';
+                    crtToggleBtn.style.backgroundColor = '#76ff03';
+                } else {
+                    document.body.classList.remove('crt-active');
+                    crtToggleBtn.textContent = 'CRT: OFF ⚪';
+                    crtToggleBtn.style.backgroundColor = '#fff';
+                }
+            }
+            setCrtState(state.crtEnabled);
+
+            crtToggleBtn.addEventListener('click', () => {
+                setCrtState(!state.crtEnabled);
+                triggerBaldiEmotion('talking');
+                updateBaldiSpeech(state.crtEnabled ? "О, старий добрий кінескопний монітор 1999 року! Очі в захваті!" : "Вимкнув CRT-фільтр. Картинка знову чиста та цифрова.");
+            });
+
+            /* =========================================================
+               3. REAL-TIME STORAGE SYNC ACROSS TABS (Stage 1.2)
+               ========================================================= */
+            window.addEventListener('storage', (event) => {
+                console.log(`[Cross-Tab Sync] Зміна в localStorage: ${event.key}`);
+                if (event.key === 'freePC_booking' || event.key === 'freePC_occupiedPcs' || event.key === 'freePC_classrooms') {
+                    state.booking = safeGetJSON('freePC_booking', null);
+                    state.occupiedPcs = safeGetJSON('freePC_occupiedPcs', {});
+                    state.classrooms = safeGetJSON('freePC_classrooms', DEFAULT_CLASSROOMS);
+                    updateUI();
+                    if (state.currentView === 'plan') render2DClassroom();
+                    if (state.currentView === 'bookings') renderBookingsView();
+                    if (state.currentView === 'admin') renderAdminView();
+                }
+            });
+
+            /* =========================================================
+               4. BALDI EMOTIONS & ANIMATIONS (Stage 2.2)
+               ========================================================= */
+            let emotionTimeout = null;
+            function triggerBaldiEmotion(emotion) {
+                if (emotionTimeout) clearTimeout(emotionTimeout);
+                baldiImg.classList.remove('baldi-talking', 'baldi-celebrate', 'baldi-angry');
+
+                if (emotion === 'talking') {
+                    baldiImg.classList.add('baldi-talking');
+                    emotionTimeout = setTimeout(() => baldiImg.classList.remove('baldi-talking'), 3500);
+                } else if (emotion === 'celebrate') {
+                    baldiImg.classList.add('baldi-celebrate');
+                    emotionTimeout = setTimeout(() => baldiImg.classList.remove('baldi-celebrate'), 4000);
+                } else if (emotion === 'angry') {
+                    baldiImg.classList.add('baldi-angry');
+                    emotionTimeout = setTimeout(() => baldiImg.classList.remove('baldi-angry'), 3500);
+                }
+            }
+
+            function updateBaldiSpeech(msg) {
+                if (msg) {
+                    baldiSpeech.textContent = msg;
+                    return;
+                }
+
+                if (!state.profile.name || !state.profile.group) {
+                    baldiSpeech.textContent = "Спочатку заповни свій профіль! Вкажи ім'я та групу, щоб отримати перепустку.";
+                    triggerBaldiEmotion('talking');
+                } else if (state.booking) {
+                    baldiSpeech.textContent = `Твій ПК #${state.booking.pcId} у кабінеті ${state.booking.cabinet} заброньовано! Слідкуй за таймером сеансу!`;
+                } else {
+                    switch (state.currentView) {
+                        case 'profile':
+                            baldiSpeech.textContent = `Привіт, ${state.profile.name}! Тут ти завжди можеш оновити свої студентські дані.`;
+                            triggerBaldiEmotion('talking');
+                            break;
+                        case 'cabinet':
+                            baldiSpeech.textContent = "Обирай кабінет! Пам'ятай: №101 та №102 вже готові у 2D!";
+                            triggerBaldiEmotion('talking');
+                            break;
+                        case 'plan':
+                            baldiSpeech.textContent = "Це 2D план кабінету. Клікай на зелені монітори або використовуй фільтр софту!";
+                            triggerBaldiEmotion('talking');
+                            break;
+                        case 'bookings':
+                            baldiSpeech.textContent = "Тут твій активний талон на ПК. Якщо закінчив раніше – звільни місце для інших!";
+                            break;
+                        case 'help':
+                            baldiSpeech.textContent = "Уважно прочитай правила школи. За порушення порядку – 99 задач з математики!";
+                            triggerBaldiEmotion('talking');
+                            break;
+                        case 'admin':
+                            baldiSpeech.textContent = "Секретний режим викладача. Контролюй комп'ютери та розкреслюй нові класи!";
+                            break;
+                    }
+                }
+            }
+
+            /* =========================================================
+               5. VIEW NAVIGATION & CHECK UNMAPPED CLASS (Stage 3.3)
+               ========================================================= */
+            function switchView(viewName) {
+                state.currentView = viewName;
+
+                viewSections.forEach(sec => sec.classList.add('hidden'));
+                const activeSec = document.getElementById(viewName + 'View');
+                if (activeSec) activeSec.classList.remove('hidden');
+
+                navTabs.forEach(tab => {
+                    if (tab.dataset.target === viewName) {
+                        tab.classList.add('retro-btn-active');
+                    } else {
+                        tab.classList.remove('retro-btn-active');
+                    }
+                });
+
+                // Dynamic background grid rotation
+                currentGridIndex = (currentGridIndex + 1) % gridStyles.length;
+                mainWorkspace.className = `main-workspace ${gridStyles[currentGridIndex]}`;
+
+                updateBaldiSpeech();
+
+                if (viewName === 'plan') render2DClassroom();
+                if (viewName === 'bookings') renderBookingsView();
+                if (viewName === 'admin') renderAdminView();
+            }
+
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    if (tab.dataset.target === 'plan') {
+                        openCabinetPlan(state.activeCabinet);
+                    } else {
+                        switchView(tab.dataset.target);
+                    }
+                });
+            });
+
+            // Check if classroom is mapped / published (Stage 3.1 & 3.3)
+            function openCabinetPlan(cabId) {
+                state.activeCabinet = cabId;
+                const cabData = state.classrooms[cabId];
+
+                if (!cabData || !cabData.published || !cabData.pcs || cabData.pcs.length === 0) {
+                    // Gatekeeper blocked: classroom not mapped!
+                    triggerBaldiEmotion('angry');
+                    updateBaldiSpeech(`Увага! Схема кабінету ${cabId} ще не розкреслена адміністратором! Заповни ручну заявку.`);
+                    
+                    unmappedCabName.textContent = cabData ? cabData.name : `Кабінет ${cabId}`;
+                    manualCabinetInput.value = cabData ? cabData.name : `Кабінет ${cabId}`;
+                    manualStudentInput.value = state.profile.name ? `${state.profile.name} (${state.profile.group})` : 'Не вказано в профілі';
+
+                    switchView('manualRequest');
+                    return;
+                }
+
+                cabinetTitle.textContent = cabId;
+                roomDoorNum.textContent = cabId;
+                switchView('plan');
+            }
+
+            goToPlanBtn.addEventListener('click', () => {
+                openCabinetPlan(cabinetSelect.value);
+            });
+
+            cancelManualBtn.addEventListener('click', () => {
+                switchView('cabinet');
+            });
+
+            // Handle Manual Form Submit
+            manualBookingForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const time = document.getElementById('manualTimeSlotSelect').value;
+
+                triggerBaldiEmotion('celebrate');
+                updateBaldiSpeech("Заявку на ручне бронювання передано вчителю Балді! Очікуйте дзвінка на урок.");
+                alert(`✅ Заявка успішно прийнята!\nКабінет: ${manualCabinetInput.value}\nЧас: ${time}\nВчитель призначить комп'ютер особисто.`);
+                switchView('cabinet');
+            });
+
+            /* =========================================================
+               6. PROFILE SAVING (Stage 1.1)
+               ========================================================= */
+            saveProfileBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const name = nameInput.value.trim();
+                const group = groupInput.value.trim();
+
+                if (!name || !group) {
+                    triggerBaldiEmotion('angry');
+                    updateBaldiSpeech("Увага! Обидва поля (Ім'я та Клас) мають бути обов'язково заповнені!");
+                    return;
+                }
+
+                state.profile = { name, group };
+                safeSetJSON('freePC_profile', state.profile);
+
+                savedTag.classList.remove('hidden');
+                setTimeout(() => savedTag.classList.add('hidden'), 2500);
+
+                triggerBaldiEmotion('celebrate');
+                updateBaldiSpeech(`Чудово, ${name}! Профіль успішно збережено в журналі. Обирай кабінет!`);
+                setTimeout(() => switchView('cabinet'), 700);
+            });
+
+            /* =========================================================
+               7. 2D CLASSROOM RENDERER (Stage 3.1 & 3.2 & Stage 4)
+               ========================================================= */
+            function render2DClassroom() {
+                deskRowsGrid.innerHTML = '';
+                const cabData = state.classrooms[state.activeCabinet];
+                if (!cabData || !cabData.pcs) return;
+
+                const filterSw = softwareFilterSelect.value;
+                const occupiedMap = state.occupiedPcs[state.activeCabinet] || {};
+
+                cabData.pcs.forEach(pc => {
+                    const isMine = state.booking && state.booking.cabinet === state.activeCabinet && state.booking.pcId === pc.id;
+                    const isOccupied = !isMine && occupiedMap[pc.id];
+                    const isUnderRepair = pc.repair;
+
+                    // Match filter
+                    const matchesFilter = filterSw === 'all' ? false : (pc.software && pc.software.includes(filterSw));
+
+                    let statusClass = 'status-free';
+                    let statusLabel = 'Вільний';
+
+                    if (isMine) {
+                        statusClass = 'status-mine';
+                        statusLabel = 'ТВІЙ ПК 🟡';
+                    } else if (isOccupied) {
+                        statusClass = 'status-occupied';
+                        statusLabel = `Зайнято (${occupiedMap[pc.id].student})`;
+                    } else if (isUnderRepair) {
+                        statusClass = 'status-repair';
+                        statusLabel = 'На ремонті ⚙️';
+                    }
+
+                    const pcStation = document.createElement('div');
+                    pcStation.className = `pc-station ${statusClass} ${matchesFilter ? 'software-matched' : ''}`;
+
+                    pcStation.innerHTML = `
+                        <div style="font-size: 15px; font-weight: 900; margin-bottom: 6px;">
+                            Місце #${pc.id}
+                        </div>
+
+                        <!-- 2D Retro Monitor & Hardware Display -->
+                        <div class="monitor-art">
+                            <div class="monitor-screen">
+                                ${isUnderRepair ? '🛠️' : (isMine ? '⭐' : (isOccupied ? '👤' : '🖥️'))}
+                            </div>
+                        </div>
+                        <div class="monitor-stand"></div>
+                        <div class="monitor-base"></div>
+
+                        <div class="pc-desk-peripherals">
+                            <span>⌨️</span> <span>🖱️</span>
+                            <span style="font-size: 10px; color: #444;">${pc.gpu ? pc.gpu.split(' ')[0] : 'GPU'}</span>
+                        </div>
+
+                        <div style="margin-top: 8px; font-size: 12px; font-weight: 900;">
+                            ${statusLabel}
+                        </div>
+                    `;
+
+                    pcStation.addEventListener('click', () => {
+                        openPcDetailsModal(pc, isMine, isOccupied, isUnderRepair, occupiedMap[pc.id]);
+                    });
+
+                    deskRowsGrid.appendChild(pcStation);
+                });
+            }
+
+            // Software Filter Change
+            softwareFilterSelect.addEventListener('change', () => {
+                state.activeFilterSoftware = softwareFilterSelect.value;
+                render2DClassroom();
+                if (state.activeFilterSoftware !== 'all') {
+                    updateBaldiSpeech(`Підсвічено комп'ютери з встановленим ${state.activeFilterSoftware}!`);
+                }
+            });
+
+            resetFilterBtn.addEventListener('click', () => {
+                softwareFilterSelect.value = 'all';
+                render2DClassroom();
+                updateBaldiSpeech("Фільтр софту скинуто. Відображено всі робочі місця.");
+            });
+
+            /* =========================================================
+               8. PC SPECIFICATIONS & BOOKING MODAL (Stage 4.1 & 5.1)
+               ========================================================= */
+            function openPcDetailsModal(pc, isMine, isOccupied, isUnderRepair, occupierInfo) {
+                state.selectedModalPc = pc;
+                modalPcNum.textContent = pc.id;
+                modalCabNum.textContent = state.activeCabinet;
+
+                modalCpu.textContent = pc.cpu || 'Intel Core i5';
+                modalRam.textContent = pc.ram || '16 GB DDR4';
+                modalGpu.textContent = pc.gpu || 'NVIDIA GeForce RTX 3060';
+                modalStorage.textContent = pc.storage || '512 GB NVMe SSD';
+
+                // Render Software Tags
+                modalSoftwareTags.innerHTML = '';
+                if (pc.software && pc.software.length > 0) {
+                    pc.software.forEach(sw => {
+                        const tag = document.createElement('span');
+                        tag.className = 'sw-tag';
+                        tag.textContent = sw;
+                        modalSoftwareTags.appendChild(tag);
+                    });
+                } else {
+                    modalSoftwareTags.innerHTML = '<span style="font-size:12px;">Базовий офісний пакет</span>';
+                }
+
+                if (isMine) {
+                    modalStatusBadge.style.background = '#fff59d';
+                    modalStatusBadge.textContent = '🟡 Це ваш заброньований комп\'ютер!';
+                    bookingActionBox.classList.add('hidden');
+                    modalNoticeBox.classList.remove('hidden');
+                    modalNoticeBox.innerHTML = `Ви зараз працюєте за цим ПК. Залишилось часу: <strong>${formatTime(getTimeRemaining())}</strong>`;
+                } else if (isOccupied) {
+                    modalStatusBadge.style.background = '#ef9a9a';
+                    modalStatusBadge.textContent = `🔴 Зайнято: ${occupierInfo ? occupierInfo.student : 'Студентом'}`;
+                    bookingActionBox.classList.add('hidden');
+                    modalNoticeBox.classList.remove('hidden');
+                    modalNoticeBox.textContent = "Цей комп'ютер зараз зайнятий іншим учнем. Оберіть вільне місце (зелене).";
+                } else if (isUnderRepair) {
+                    modalStatusBadge.style.background = '#e0e0e0';
+                    modalStatusBadge.textContent = '⚪ ПК на технічному обслуговуванні (Ремонт)';
+                    bookingActionBox.classList.add('hidden');
+                    modalNoticeBox.classList.remove('hidden');
+                    modalNoticeBox.textContent = "Комп'ютер тимчасово вимкнено для модернізації та чистки.";
+                } else {
+                    modalStatusBadge.style.background = '#a5d6a7';
+                    modalStatusBadge.textContent = '🟢 ПК вільний для бронювання!';
+                    bookingActionBox.classList.remove('hidden');
+                    modalNoticeBox.classList.add('hidden');
+                }
+
+                pcDetailsModal.classList.remove('hidden');
+            }
+
+            closePcModalBtn.addEventListener('click', () => {
+                pcDetailsModal.classList.add('hidden');
+            });
+
+            // Confirm Booking Action (Stage 5.1 & 5.2)
+            confirmBookingBtn.addEventListener('click', () => {
+                if (!state.selectedModalPc) return;
+
+                if (!state.profile.name || !state.profile.group) {
+                    pcDetailsModal.classList.add('hidden');
+                    triggerBaldiEmotion('angry');
+                    updateBaldiSpeech("Помилка! Спочатку вкажи своє ім'я та групу у профілі!");
+                    switchView('profile');
+                    return;
+                }
+
+                if (state.booking) {
+                    triggerBaldiEmotion('angry');
+                    updateBaldiSpeech("Правило школи: 1 ПК на людину! Спочатку звільни попереднє місце!");
+                    alert("⚠️ Ви вже маєте заброньований ПК!\nСкасуйте поточний сеанс перед тим, як брати інший.");
+                    return;
+                }
+
+                const durationMinutes = parseInt(sessionDurationSelect.value, 10);
+                const now = Date.now();
+                const durationMs = (durationMinutes === 20 && sessionDurationSelect.options[sessionDurationSelect.selectedIndex].text.includes('секунд'))
+                    ? 20 * 1000
+                    : durationMinutes * 60 * 1000;
+
+                state.booking = {
+                    pcId: state.selectedModalPc.id,
+                    cabinet: state.activeCabinet,
+                    userName: state.profile.name,
+                    userGroup: state.profile.group,
+                    startTime: now,
+                    endTime: now + durationMs,
+                    durationMinutes: durationMinutes
+                };
+
+                safeSetJSON('freePC_booking', state.booking);
+
+                // Add to occupied list
+                if (!state.occupiedPcs[state.activeCabinet]) {
+                    state.occupiedPcs[state.activeCabinet] = {};
+                }
+                state.occupiedPcs[state.activeCabinet][state.selectedModalPc.id] = {
+                    student: state.profile.name,
+                    group: state.profile.group
+                };
+                safeSetJSON('freePC_occupiedPcs', state.occupiedPcs);
+
+                pcDetailsModal.classList.add('hidden');
+                triggerBaldiEmotion('celebrate');
+                updateBaldiSpeech(`Вітаю, ${state.profile.name}! ПК #${state.booking.pcId} успішно закріплено за тобою!`);
+                updateUI();
+                render2DClassroom();
+            });
+
+            /* =========================================================
+               9. REAL-TIME COUNTDOWN TIMER & AUTO-EXPIRY (Stage 5.2 & 5.3)
+               ========================================================= */
+            function getTimeRemaining() {
+                if (!state.booking || !state.booking.endTime) return 0;
+                const remaining = Math.max(0, Math.floor((state.booking.endTime - Date.now()) / 1000));
+                return remaining;
+            }
+
+            function formatTime(totalSeconds) {
+                const mins = Math.floor(totalSeconds / 60);
+                const secs = totalSeconds % 60;
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            // Main 1-second Interval Loop
+            setInterval(() => {
+                if (state.booking) {
+                    const remainingSeconds = getTimeRemaining();
+
+                    if (remainingSeconds <= 0) {
+                        // Auto-Expiry reached 00:00 (Stage 5.3)
+                        handleAutoSessionExpiry();
+                    } else {
+                        const formatted = formatTime(remainingSeconds);
+                        sessionTimerDisplay.textContent = `⏳ ${formatted}`;
+                        boardChalkTimer.textContent = `СЕАНС: ПК #${state.booking.pcId} [${formatted}]`;
+                    }
+                } else {
+                    boardChalkTimer.textContent = 'СЕАНС: НЕ АКТИВНИЙ';
+                }
+            }, 1000);
+
+            function handleAutoSessionExpiry() {
+                triggerBaldiEmotion('talking');
+                updateBaldiSpeech("Час сеансу вичерпано! Дякуємо за звільнення місця!");
+                alert("⏰ Час сеансу вичерпано!\nВаш комп'ютер автоматично звільнено. Дякуємо за дотримання правил школи!");
+                cancelBooking(true);
+            }
+
+            /* =========================================================
+               10. BOOKING CANCELLATION & UI SYNC
+               ========================================================= */
+            function cancelBooking(isAuto = false) {
+                if (state.booking) {
+                    const cab = state.booking.cabinet;
+                    const pcId = state.booking.pcId;
+
+                    if (state.occupiedPcs[cab] && state.occupiedPcs[cab][pcId]) {
+                        delete state.occupiedPcs[cab][pcId];
+                        safeSetJSON('freePC_occupiedPcs', state.occupiedPcs);
+                    }
+                }
+
+                state.booking = null;
+                localStorage.removeItem('freePC_booking');
+                updateUI();
+
+                if (state.currentView === 'plan') render2DClassroom();
+                if (state.currentView === 'bookings') renderBookingsView();
+
+                if (!isAuto) {
+                    triggerBaldiEmotion('talking');
+                    updateBaldiSpeech("Бронювання успішно скасовано. Комп'ютер знову доступний іншим!");
+                }
+            }
+
+            cancelBookingBtn.addEventListener('click', () => cancelBooking(false));
+
+            function updateUI() {
+                if (state.booking) {
+                    statusText.textContent = `Активно: Каб. ${state.booking.cabinet} | ПК #${state.booking.pcId} (${state.booking.userName})`;
+                    statusBar.className = "status-bar status-active";
+                    sessionTimerDisplay.classList.remove('hidden');
+                    cancelBookingBtn.classList.remove('hidden');
+                } else {
+                    statusText.textContent = "Немає активного бронювання";
+                    statusBar.className = "status-bar";
+                    sessionTimerDisplay.classList.add('hidden');
+                    cancelBookingBtn.classList.add('hidden');
+                }
+            }
+
+            /* =========================================================
+               11. MY BOOKINGS VIEW RENDERER
+               ========================================================= */
+            function renderBookingsView() {
+                if (state.booking) {
+                    const remaining = formatTime(getTimeRemaining());
+                    bookingCardContent.innerHTML = `
+                        <div style="background-color: #e8f5e9; border: 4px solid #000; box-shadow: 4px 4px 0 #000; padding: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 15px;">
+                                <h3 style="font-weight: 900; font-size: 20px;">Активний талон учня</h3>
+                                <span class="timer-badge">⏳ ${remaining}</span>
+                            </div>
+                            <p style="font-size: 16px; font-weight: bold; margin-bottom: 6px;">🏫 Кабінет: <strong>${state.booking.cabinet}</strong></p>
+                            <p style="font-size: 16px; font-weight: bold; margin-bottom: 6px;">🖥️ Робоче місце: <strong>ПК #${state.booking.pcId}</strong></p>
+                            <p style="font-size: 16px; font-weight: bold; margin-bottom: 6px;">👤 Учень: <strong>${state.booking.userName} (${state.booking.userGroup})</strong></p>
+                            <p style="font-size: 14px; color: #555; margin-top: 10px;">
+                                ⚠️ При завершенні зворотного відліку ПК звільняється автоматично.
+                            </p>
+                            <button id="cancelFromBookingsBtn" class="retro-btn" style="background-color: #ef5350; color: #fff; margin-top: 18px; width: 100%; text-align: center; justify-content: center; font-size: 16px;">
+                                Звільнити комп'ютер достроково
+                            </button>
+                        </div>
+                    `;
+                    document.getElementById('cancelFromBookingsBtn').addEventListener('click', () => cancelBooking(false));
+                } else {
+                    bookingCardContent.innerHTML = `
+                        <div style="background-color: #fffde7; border: 4px solid #000; box-shadow: 4px 4px 0 #000; padding: 25px; text-align: center;">
+                            <p style="font-weight: 900; font-size: 20px; margin-bottom: 12px;">Активних бронювань немає 📭</p>
+                            <p style="font-size: 15px; margin-bottom: 20px;">Ви ще не обрали комп'ютер для навчальної сесії.</p>
+                            <button onclick="document.querySelector('[data-target=\\'cabinet\\']').click()" class="retro-btn btn-cabinet" style="display: inline-flex; font-size: 16px;">
+                                Перейти до вибору кабінету ➔
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+
+            /* =========================================================
+               12. TEACHER / ADMIN PANEL & LAYOUT EDITOR (Stage 6 & Stage 3.3)
+               ========================================================= */
+            // Secret triggers: Double click on blackboard or click Admin in menu
+            schoolChalkboard.addEventListener('dblclick', () => {
+                switchView('admin');
+                triggerBaldiEmotion('talking');
+                updateBaldiSpeech("Секретний вхід викладача активовано через шкільну дошку!");
+            });
+
+            adminSecretBtn.addEventListener('click', () => {
+                switchView('admin');
+            });
+
+            adminLoginBtn.addEventListener('click', () => {
+                const pass = adminPasswordInput.value.trim().toLowerCase();
+                if (pass === 'baldi') {
+                    state.adminUnlocked = true;
+                    adminAuthError.classList.add('hidden');
+                    renderAdminView();
+                    triggerBaldiEmotion('celebrate');
+                    updateBaldiSpeech("Доступ дозволено! Ласкаво просимо, шановний викладачу!");
+                } else {
+                    adminAuthError.classList.remove('hidden');
+                    triggerBaldiEmotion('angry');
+                    updateBaldiSpeech("Невірний пароль! Тільки вчитель знає секретний код від класу!");
+                }
+            });
+
+            adminLogoutBtn.addEventListener('click', () => {
+                state.adminUnlocked = false;
+                adminPasswordInput.value = '';
+                renderAdminView();
+                updateBaldiSpeech("Вихід з режиму викладача здійснено.");
+            });
+
+            function renderAdminView() {
+                if (!state.adminUnlocked) {
+                    adminAuthBox.classList.remove('hidden');
+                    adminDashboardBox.classList.add('hidden');
+                    return;
+                }
+
+                adminAuthBox.classList.add('hidden');
+                adminDashboardBox.classList.remove('hidden');
+
+                // Render Occupied Students List
+                adminOccupiedList.innerHTML = '';
+                let totalOccupiedCount = 0;
+                Object.keys(state.occupiedPcs).forEach(cab => {
+                    const pcs = state.occupiedPcs[cab];
+                    Object.keys(pcs).forEach(pcId => {
+                        totalOccupiedCount++;
+                        const item = document.createElement('div');
+                        item.style = "background: #fff; border: 2px solid #000; padding: 6px 10px; margin-bottom: 6px; font-weight: bold; display: flex; justify-content: space-between;";
+                        item.innerHTML = `
+                            <span>Каб. ${cab} | ПК #${pcId} ➔ <strong>${pcs[pcId].student}</strong> (${pcs[pcId].group})</span>
+                            <button class="retro-btn" style="padding: 2px 8px; font-size: 11px; background: #ffcdd2;" onclick="window.adminForceFree('${cab}', '${pcId}')">
+                                Звільнити
+                            </button>
+                        `;
+                        adminOccupiedList.appendChild(item);
+                    });
+                });
+
+                if (totalOccupiedCount === 0) {
+                    adminOccupiedList.innerHTML = '<p style="color: #666; font-style: italic;">Зараз усі комп\'ютери вільні.</p>';
+                }
+
+                // Render Layout Editor for selected classroom
+                renderAdminLayoutEditor();
+            }
+
+            window.adminForceFree = function(cab, pcId) {
+                if (state.occupiedPcs[cab] && state.occupiedPcs[cab][pcId]) {
+                    delete state.occupiedPcs[cab][pcId];
+                    safeSetJSON('freePC_occupiedPcs', state.occupiedPcs);
+                }
+                if (state.booking && state.booking.cabinet === cab && state.booking.pcId == pcId) {
+                    cancelBooking(true);
+                }
+                renderAdminView();
+                if (state.currentView === 'plan') render2DClassroom();
+            };
+
+            function renderAdminLayoutEditor() {
+                const cabId = adminClassroomSelect.value;
+                const cabData = state.classrooms[cabId] || { published: false, pcs: [] };
+
+                if (cabData.published) {
+                    adminTogglePublishBtn.textContent = 'Статус: Опубліковано 🟢 (Клікніть щоб приховати)';
+                    adminTogglePublishBtn.style.backgroundColor = '#76ff03';
+                } else {
+                    adminTogglePublishBtn.textContent = 'Статус: Чернетка (Не розкреслено) 🔴 (Клікніть щоб опублікувати)';
+                    adminTogglePublishBtn.style.backgroundColor = '#ff8a80';
+                }
+
+                adminCanvasGrid.innerHTML = '';
+                const maxSlots = 8;
+                const currentPcs = cabData.pcs || [];
+
+                for (let i = 1; i <= maxSlots; i++) {
+                    const existingPc = currentPcs.find(p => p.id === i);
+                    const slot = document.createElement('div');
+                    slot.className = `admin-slot ${existingPc ? 'has-pc' : ''}`;
+
+                    if (existingPc) {
+                        slot.innerHTML = `
+                            <div>🖥️ ПК #${existingPc.id}</div>
+                            <div style="font-size: 11px; margin: 4px 0;">${existingPc.repair ? '⚪ Ремонт' : '🟢 Працює'}</div>
+                            <div style="font-size: 10px; color: #333;">${existingPc.software ? existingPc.software.slice(0, 2).join(', ') : 'Office'}</div>
+                        `;
+                    } else {
+                        slot.innerHTML = `
+                            <div style="color: #888;">+ Пусте місце</div>
+                            <div style="font-size: 11px;">(Слот #${i})</div>
+                        `;
+                    }
+
+                    slot.addEventListener('click', () => {
+                        toggleAdminPcSlot(cabId, i, existingPc);
+                    });
+
+                    adminCanvasGrid.appendChild(slot);
+                }
+            }
+
+            function toggleAdminPcSlot(cabId, slotId, existingPc) {
+                if (!state.classrooms[cabId]) {
+                    state.classrooms[cabId] = { name: `Кабінет ${cabId}`, published: false, pcs: [] };
+                }
+
+                if (!existingPc) {
+                    // Add new PC to classroom
+                    state.classrooms[cabId].pcs.push({
+                        id: slotId,
+                        cpu: "Intel Core i5-12400F",
+                        ram: "16 GB DDR4",
+                        gpu: "RTX 3060",
+                        software: ["VS Code", "Python", "C++"],
+                        repair: false
+                    });
+                } else if (!existingPc.repair) {
+                    // Switch to Repair status
+                    existingPc.repair = true;
+                } else {
+                    // Remove PC
+                    state.classrooms[cabId].pcs = state.classrooms[cabId].pcs.filter(p => p.id !== slotId);
+                }
+
+                safeSetJSON('freePC_classrooms', state.classrooms);
+                renderAdminLayoutEditor();
+                if (state.currentView === 'plan') render2DClassroom();
+            }
+
+            adminClassroomSelect.addEventListener('change', renderAdminLayoutEditor);
+
+            adminTogglePublishBtn.addEventListener('click', () => {
+                const cabId = adminClassroomSelect.value;
+                if (!state.classrooms[cabId]) {
+                    state.classrooms[cabId] = { name: `Кабінет ${cabId}`, published: false, pcs: [] };
+                }
+                state.classrooms[cabId].published = !state.classrooms[cabId].published;
+                safeSetJSON('freePC_classrooms', state.classrooms);
+                renderAdminLayoutEditor();
+                updateBaldiSpeech(`Статус кабінету ${cabId} оновлено на: ${state.classrooms[cabId].published ? 'Опубліковано' : 'Не розкреслено'}!`);
+            });
+
+            // Admin Clear All Bookings in 1 Click (Stage 6.2)
+            adminClearAllBookingsBtn.addEventListener('click', () => {
+                if (confirm("Ви дійсно бажаєте очистити ВСІ бронювання в усій школі?")) {
+                    state.occupiedPcs = {};
+                    safeSetJSON('freePC_occupiedPcs', state.occupiedPcs);
+                    cancelBooking(true);
+                    renderAdminView();
+                    triggerBaldiEmotion('celebrate');
+                    updateBaldiSpeech("Усі комп'ютерні класи очищено! Усі місця вільні для нового уроку!");
+                }
+            });
+
+            // Reset Default Layouts 101/102
+            adminResetDefaultLayoutsBtn.addEventListener('click', () => {
+                if (confirm("Відновити базові розкреслені схеми для кабінетів 101 та 102?")) {
+                    state.classrooms = JSON.parse(JSON.stringify(DEFAULT_CLASSROOMS));
+                    safeSetJSON('freePC_classrooms', state.classrooms);
+                    renderAdminView();
+                    alert("Схеми кабінетів 101 та 102 відновлено до канонічного вигляду!");
+                }
+            });
+
+            /* =========================================================
+               13. INITIAL APP STARTUP
+               ========================================================= */
+            updateUI();
+            switchView('profile');
+        });
+    </script>
+</body>
+</html>
