@@ -1092,10 +1092,6 @@
                     <span>✏️</span>
                 </h2>
                 <div class="form-group">
-                    <label class="form-label">Ім'я та Прізвище:</label>
-                    <input type="text" id="nameInput" class="form-input" placeholder="Введіть ваше справжнє повне ім'я...">
-                </div>
-                <div class="form-group">
                     <label class="form-label">Група / Клас:</label>
                     <select id="groupInput" class="form-select">
                         <option value="">-- Оберіть вашу групу / клас --</option>
@@ -1106,8 +1102,15 @@
                         <option value="КІ-21">Група КІ-21 (Комп'ютерна інженерія)</option>
                         <option value="КІ-22">Група КІ-22 (Комп'ютерна інженерія)</option>
                         <option value="ІПЗ-23">Група ІПЗ-23 (Програмна інженерія)</option>
-                        <option value="Вчитель">Викладацький склад / Гість</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ім'я та Прізвище (згідно зі списком журналу):</label>
+                    <input type="text" id="nameInput" class="form-input" list="studentNamesList" placeholder="Введіть ваше повне ім'я та прізвище...">
+                    <datalist id="studentNamesList"></datalist>
+                    <div id="classRosterHint" style="font-size: 11px; font-weight: bold; margin-top: 5px; color: #444;">
+                        * Доступ дозволено лише для 30 офіційно зарахованих учнів обраного класу.
+                    </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 15px; margin-top: 20px;">
                     <button type="button" id="saveProfileBtn" class="retro-btn btn-profile" style="background-color: #ec407a; color: #fff;">
@@ -1606,6 +1609,68 @@
                 }
             };
 
+            /* =========================================================
+               OFFICIAL SCHOOL ROSTER DATABASE (30 Students Per Class)
+               ========================================================= */
+            const SCHOOL_ROSTER = {
+                "10-А": [
+                    "Андрій Мельник", "Богдан Шевченко", "Валентин Коваленко", "Вікторія Бойко", "Владислав Кравченко",
+                    "Дарина Олійник", "Денис Ткаченко", "Дмитро Мороз", "Євген Поліщук", "Іван Лисенко",
+                    "Ірина Захарченко", "Катерина Руденко", "Максим Дем'янюк", "Марія Савченко", "Микола Бондаренко",
+                    "Назарій Марченко", "Наталія Павленко", "Оксана Кузьменко", "Олександр Клименко", "Олена Петренко",
+                    "Ольга Сидоренко", "Павло Воронін", "Роман Гаврилюк", "Світлана Гриценко", "Сергій Пономаренко",
+                    "Софія Литвин", "Тарас Козак", "Тетяна Романенко", "Юлія Яковенко", "Юрій Дорошенко"
+                ],
+                "10-Б": [
+                    "Анастасія Васильчук", "Артем Гончарук", "Богдана Коваль", "Василь Семенюк", "Вероніка Дяченко",
+                    "Володимир Карпенко", "Діана Музика", "Ілля Палій", "Інна Костюк", "Костянтин Романюк",
+                    "Лариса Ткач", "Леонід Прокопенко", "Любов Степаненко", "Марина Бабенко", "Матвій Глушко",
+                    "Мирослав Сороченко", "Надія Тарасенко", "Олег Зінченко", "Олеся Островська", "Поліна Корнійчук",
+                    "Руслан Федоренко", "Святослав Мельничук", "Станіслав Юрченко", "Тимофій Ярошенко", "Христина Лук'яненко",
+                    "Ярослав Білоус", "Аліна Довженко", "Антон Кривоніс", "Валерія Назаренко", "Гліб Чумак"
+                ],
+                "11-А": [
+                    "Анна Данилюк", "Вадим Паламарчук", "Віталій Щербак", "Ганна Салата", "Данило Хоменко",
+                    "Єлизавета Швець", "Захар Бровар", "Зоряна Приходько", "Ігор Вакуленко", "Ілона Волинець",
+                    "Кирило Макаренко", "Ксенія Бондар", "Лілія Загородня", "Любомир Гапон", "Мар'яна Кононенко",
+                    "Микита Ярема", "Михайло Горват", "Ніна Кравчук", "Остап Заєць", "Петро Демченко",
+                    "Радіон Грицай", "Роксолана Снігур", "Руслана Лапко", "Семен Москаленко", "Таміла Ковальчук",
+                    "Федір Задорожний", "Юліан Семашко", "Яна Кирилюк", "Аркадій Луценко", "Борис Кучер"
+                ],
+                "11-Б": [
+                    "Адріан Дубовик", "Алла Приймак", "Андріана Голуб", "Василина Остапенко", "Віктор Гуменюк",
+                    "Владислава Костюченко", "Георгій Мазур", "Давид Мартинюк", "Єва Стецюк", "Жанна Левицька",
+                    "Злата Корсун", "Іванна Салабай", "Йосип Волошин", "Карина Дзюба", "Лукас Марчук",
+                    "Людмила Синиця", "Максиміліан Барабаш", "Марко Куліш", "Нестор Костенко", "Оксана Шпак",
+                    "Орест Пасічник", "Пилип Буряк", "Радомир Твердохліб", "Ростислав Онищенко", "Савелій Гнатюк",
+                    "Тамара Чуприна", "Уляна Курило", "Филип Батрак", "Юліана Горобець", "Ярослава Дмитренко"
+                ],
+                "КІ-21": [
+                    "Артур Мельниченко", "Борис Ващенко", "Валерій Сидорук", "Віктор Ткач", "Віталіна Кулик",
+                    "Владислав Оніщук", "Герман Лукін", "Денис Головач", "Дмитро Сорокін", "Едуард Самойленко",
+                    "Євгеній Коваль", "Ілля Баранов", "Ілля Нестеренко", "Кирило Кохан", "Макар Лихогруд",
+                    "Максим Глущенко", "Микита Бобров", "Микола Семенцов", "Олександр Корж", "Олексій Савчук",
+                    "Олена Бєлова", "Павло Ігнатенко", "Роберт Філатов", "Роман Приступа", "Сергій Захаров",
+                    "Тарас Миронов", "Тимофій Рибак", "Федір Борисенко", "Юрій Шматко", "Ярослав Комарницький"
+                ],
+                "КІ-22": [
+                    "Антон Поліщук", "Богдан Осадчий", "Вадим Рудик", "Валерій Карпюк", "Вікторія Дем'яненко",
+                    "Владлен Гупало", "Всеволод Пономарьов", "Григорій Таран", "Данило Ситник", "Денис Малець",
+                    "Діана Горошко", "Євген Воронцов", "Іван Скрипка", "Ігор Кравчун", "Костянтин Литвиненко",
+                    "Лев Касяненко", "Маркіян Сулима", "Матвій Савельєв", "Михайло Цимбалюк", "Назар Паладій",
+                    "Олесь Гавриш", "Павло Чуйко", "Ростислав Деркач", "Святослав Білик", "Сергій Капуста",
+                    "Станіслав Пастух", "Степан Лазаренко", "Тарас Гречка", "Юліан Кліщ", "Ярополк Мовчан"
+                ],
+                "ІПЗ-23": [
+                    "Альона Барабаш", "Анастасія Демчик", "Анатолій Васько", "Арсен Потапенко", "Валентина Шульга",
+                    "Віталій Володько", "Владислав Пасічний", "В'ячеслав Малюк", "Гліб Заболотний", "Дарія Проценко",
+                    "Дем'ян Кривонос", "Дмитро Качур", "Емілія Голобородько", "Зіновій Книш", "Іларіон Панасюк",
+                    "Ірина Волошина", "Катерина Чумак", "Левко Бульба", "Марія Войтенко", "Марта Діденко",
+                    "Микола Шпакович", "Олексій Харченко", "Олена Задорожна", "Ольга Куриленко", "Радіон Мельник",
+                    "Світлана Сидоренко", "Соломія Гриневич", "Степан Байда", "Тетяна Мартиненко", "Юрій Кравців"
+                ]
+            };
+
             // Global State
             let state = {
                 profile: safeGetJSON('freePC_profile', { name: '', group: '' }),
@@ -1716,9 +1781,32 @@
             const manualBookingForm = document.getElementById('manualBookingForm');
             const cancelManualBtn = document.getElementById('cancelManualBtn');
 
+            // Update Datalist when Class is chosen
+            const studentNamesList = document.getElementById('studentNamesList');
+            function populateStudentDatalist(selectedClass) {
+                studentNamesList.innerHTML = '';
+                if (!selectedClass || !SCHOOL_ROSTER[selectedClass]) return;
+                SCHOOL_ROSTER[selectedClass].forEach(studentName => {
+                    const opt = document.createElement('option');
+                    opt.value = studentName;
+                    studentNamesList.appendChild(opt);
+                });
+            }
+
+            groupInput.addEventListener('change', () => {
+                populateStudentDatalist(groupInput.value);
+                nameInput.value = '';
+                if (groupInput.value && SCHOOL_ROSTER[groupInput.value]) {
+                    updateBaldiSpeech(`Клас ${groupInput.value} обрано. У журналі рівно 30 учнів. Введи своє ім'я!`);
+                }
+            });
+
             // Populate form if profile data exists
             if (state.profile.name) nameInput.value = state.profile.name;
-            if (state.profile.group) groupInput.value = state.profile.group;
+            if (state.profile.group) {
+                groupInput.value = state.profile.group;
+                populateStudentDatalist(state.profile.group);
+            }
 
             /* =========================================================
                2. CRT EFFECT SYSTEM (Stage 7.1)
@@ -1901,7 +1989,7 @@
             });
 
             /* =========================================================
-               6. PROFILE SAVING (Stage 1.1)
+               6. STRICT STUDENT PROFILE VALIDATION AGAINST ROSTER
                ========================================================= */
             function sanitizeHTML(str) {
                 const temp = document.createElement('div');
@@ -1912,48 +2000,48 @@
             saveProfileBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 const rawName = nameInput.value.trim();
-                const group = groupInput.value.trim();
+                const selectedClass = groupInput.value.trim();
 
-                // Strict First-Name Last-Name validation (at least 2 words, letters only, min 3 chars each)
-                const words = rawName.split(/\s+/).filter(w => w.length > 0);
-                const lettersOnlyRe = /^[a-zA-Zа-яА-ЯіІїЇєЄґҐ'-]+$/;
-                const profanityOrJunk = /^(какашка|лох|дурак|дебил|сука|хуй|пидор|test|admin|user|qwerty|asdf|йцукен|123)$/i;
-
-                if (words.length < 2) {
+                if (!selectedClass) {
                     triggerBaldiEmotion('angry');
-                    updateBaldiSpeech("Помилка! Введіть повне Ім'я та Прізвище (2 слова, наприклад: Тарас Шевченко)!");
-                    alert("⚠️ Введіть ПОВНЕ Ім'я та Прізвище (не менше двох слів)!");
-                    nameInput.focus();
-                    return;
-                }
-
-                const invalidWord = words.find(w => w.length < 3 || !lettersOnlyRe.test(w) || profanityOrJunk.test(w));
-                if (invalidWord) {
-                    triggerBaldiEmotion('angry');
-                    updateBaldiSpeech("Неприпустиме ім'я! Кожне слово має містити мінімум 3 літери без цифр та спаму!");
-                    alert("⚠️ Некоректне ім'я! Кожне слово (Ім'я та Прізвище) має складатися лише з літер (мінімум 3 літери)!");
-                    nameInput.focus();
-                    return;
-                }
-
-                if (!group) {
-                    triggerBaldiEmotion('angry');
-                    updateBaldiSpeech("Оберіть вашу групу чи клас зі списку!");
-                    alert("⚠️ Будь ласка, оберіть вашу групу / клас зі списку!");
+                    updateBaldiSpeech("Спочатку обери свій клас зі списку!");
+                    alert("⚠️ Будь ласка, оберіть ваш клас / групу!");
                     groupInput.focus();
                     return;
                 }
 
-                const cleanName = words.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-                state.profile = { name: sanitizeHTML(cleanName), group: sanitizeHTML(group) };
-                nameInput.value = cleanName;
+                const validRoster = SCHOOL_ROSTER[selectedClass];
+                if (!validRoster) {
+                    triggerBaldiEmotion('angry');
+                    updateBaldiSpeech("Клас не знайдено в журналі школи!");
+                    alert("⚠️ Невідомий клас!");
+                    return;
+                }
+
+                // Strict validation: must match one of the 30 authorized students in this class
+                const matchedStudent = validRoster.find(
+                    student => student.localeCompare(rawName, 'uk', { sensitivity: 'accent' }) === 0 ||
+                               student.toLowerCase() === rawName.toLowerCase()
+                );
+
+                if (!matchedStudent) {
+                    triggerBaldiEmotion('angry');
+                    updateBaldiSpeech("I Hear Everything! Wrong Name! Тебе немає в журналі цього класу! 📏");
+                    alert(`🚨 I Hear Everything! Wrong Name!\n\nУчня «${rawName}» немає у списку 30 зарахованих учнів для класу ${selectedClass}!\nФейкові імена заборонені в школі Балді!`);
+                    nameInput.value = '';
+                    nameInput.focus();
+                    return;
+                }
+
+                state.profile = { name: matchedStudent, group: selectedClass };
+                nameInput.value = matchedStudent;
                 safeSetJSON('freePC_profile', state.profile);
 
                 savedTag.classList.remove('hidden');
                 setTimeout(() => savedTag.classList.add('hidden'), 2500);
 
                 triggerBaldiEmotion('celebrate');
-                updateBaldiSpeech(`Чудово, ${state.profile.name}! Профіль (${state.profile.group}) успішно внесено до журналу. Обирай кабінет!`);
+                updateBaldiSpeech(`Чудово, ${state.profile.name}! Особу підтверджено в журналі ${state.profile.group}. Обирай кабінет!`);
                 setTimeout(() => switchView('cabinet'), 700);
             });
 
