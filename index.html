@@ -1562,12 +1562,21 @@
                         <div style="font-family: 'Comic Sans MS', sans-serif; font-size: 14px; font-weight: bold; color: #ffeb3b; margin-bottom: 12px; max-width: 420px; text-align: center;">
                             «Ляск-ляск лінійкою! Ніхто не втече з моєї 3D школи без розв'язаних уроків!»
                         </div>
-                        <button type="button" class="restart-baldi-btn" id="restartBaldiBtn">
-                            🔄 ПОВТОРНИЙ СТАРТ / RESTART
+                        <button type="button" class="restart-baldi-btn" id="baldiRestartBtn">
+                            ▶ RESTART GAME / СПРОБУВАТИ ЗНОВУ
                         </button>
                     </div>
 
-                    <canvas id="arcadeCanvas" width="560" height="340" tabindex="0"></canvas>
+                    <div style="position: relative; display: inline-block;">
+                        <canvas id="arcadeCanvas" width="560" height="340" tabindex="0" style="cursor: crosshair;"></canvas>
+                        <!-- 3D Crosshair & Mouse Look Indicator -->
+                        <div id="arcade3dCrosshair" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; color: #76ff03; font-size: 24px; font-weight: 900; text-shadow: 1px 1px 0 #000; line-height: 1;">
+                            +
+                        </div>
+                        <div id="mouseLockBanner" style="display: none; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); pointer-events: none; background: rgba(0,0,0,0.75); color: #ffff00; font-family: 'Courier New', monospace; font-size: 11px; font-weight: bold; padding: 3px 8px; border: 1px solid #76ff03;">
+                            [Клікни по екрану для огляду мишею (ESC — вихід)]
+                        </div>
+                    </div>
 
                     <!-- Touch Controls for Mobile / Tablets -->
                     <div class="arcade-controls-panel" id="arcadeCatcherControls">
@@ -3250,12 +3259,15 @@
 
             const arcadeStartBtn = document.getElementById('arcadeStartBtn');
             const realStartBtn = document.getElementById('realStartBtn');
-            const restartBaldiBtn = document.getElementById('restartBaldiBtn');
+            const baldiRestartBtn = document.getElementById('baldiRestartBtn');
+            const restartBaldiBtn = baldiRestartBtn || document.getElementById('restartBaldiBtn');
             const startBaldiGameBtn = document.getElementById('startBaldiGameBtn');
             const arcadeSchoolStartBtn = startBaldiGameBtn; // Alias for backward compatibility
             const schoolhouseSplashOverlay = document.getElementById('schoolhouseSplashOverlay');
             const schoolhouseGameOverOverlay = document.getElementById('schoolhouseGameOverOverlay');
             const gameOverStatsSummary = document.getElementById('gameOverStatsSummary');
+            const arcade3dCrosshair = document.getElementById('arcade3dCrosshair');
+            const mouseLockBanner = document.getElementById('mouseLockBanner');
             const arcadeLeftBtn = document.getElementById('arcadeLeftBtn');
             const arcadeRightBtn = document.getElementById('arcadeRightBtn');
 
@@ -3351,7 +3363,11 @@
                 schoolRunning = false;
 
                 if (mode === 'catcher') {
+                    if (document.exitPointerLock) document.exitPointerLock();
+                    if (arcade3dCrosshair) arcade3dCrosshair.style.display = 'none';
+                    if (mouseLockBanner) mouseLockBanner.style.display = 'none';
                     if (schoolhouseSplashOverlay) schoolhouseSplashOverlay.classList.add('hidden');
+                    if (schoolhouseGameOverOverlay) schoolhouseGameOverOverlay.classList.add('hidden');
                     tabModeCatcher.classList.add('active');
                     tabModeSchoolhouse.classList.remove('active');
                     arcadeRulesHint.innerHTML = "🎯 <strong>Режим «Ловець зошитів»:</strong> Керуй портфелем (← та →). Лови зошити (+10), збирай лінійки (+25) та уникай гнівного Балді!";
@@ -3366,9 +3382,11 @@
                 } else {
                     tabModeCatcher.classList.remove('active');
                     tabModeSchoolhouse.classList.add('active');
-                    arcadeRulesHint.innerHTML = "🏫 <strong>Режим «Класична Школа Baldi»:</strong> Ходи коридорами школи (WASD / Стрілки / D-Pad на екрані). Знайди всі 5 кольорових зошитів у класах та розв'язуй приклади на Think Pad! Тікай від Балді!";
+                    arcadeRulesHint.innerHTML = "🏫 <strong>Режим «3D Школа Baldi»:</strong> Огляд мишкою як у Minecraft (клікни по екрану), ходьба WASD (W/S — вперед/назад, A/D — стрейф). Знайди 5 зошитів у класах!";
                     arcadeCatcherControls.style.display = 'none';
                     arcadeSchoolControls.style.display = 'flex';
+                    if (arcade3dCrosshair) arcade3dCrosshair.style.display = 'block';
+                    if (mouseLockBanner) mouseLockBanner.style.display = 'block';
 
                     updateSchoolHeader();
                     initSchoolhouseScreen();
@@ -3529,7 +3547,34 @@
                 arcadeCtx.textAlign = 'left';
             }
 
-            /* ---------- Mode 2 Engine (Pseudo-3D Raycasting Baldi Schoolhouse) ---------- */
+            /* Pointer Lock for Minecraft-style Mouse Look */
+            if (arcadeCanvas) {
+                arcadeCanvas.addEventListener('click', () => {
+                    if (currentGameMode === 'schoolhouse' && schoolRunning) {
+                        arcadeCanvas.requestPointerLock = arcadeCanvas.requestPointerLock || arcadeCanvas.mozRequestPointerLock;
+                        if (arcadeCanvas.requestPointerLock) {
+                            arcadeCanvas.requestPointerLock();
+                        }
+                    }
+                });
+            }
+
+            document.addEventListener('pointerlockchange', () => {
+                const isLocked = document.pointerLockElement === arcadeCanvas;
+                if (mouseLockBanner) {
+                    mouseLockBanner.style.display = (isLocked || !schoolRunning) ? 'none' : 'block';
+                }
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (currentGameMode === 'schoolhouse' && schoolRunning) {
+                    if (document.pointerLockElement === arcadeCanvas) {
+                        const movementX = e.movementX || e.mozMovementX || 0;
+                        const mouseSensitivity = 0.0035;
+                        schoolPlayer.angle += movementX * mouseSensitivity;
+                    }
+                }
+            });
             function startSchoolhouseGame() {
                 if (schoolhouseSplashOverlay) schoolhouseSplashOverlay.classList.add('hidden');
                 if (schoolhouseGameOverOverlay) schoolhouseGameOverOverlay.classList.add('hidden');
@@ -3566,32 +3611,41 @@
             function schoolhouseLoop() {
                 if (!schoolRunning || !arcadeCtx) return;
 
-                // 1. Controls & Player Movement in 3D (Forward, Backward, Left/Right Turn)
-                if (schoolKeys.left) {
-                    schoolPlayer.angle -= schoolPlayer.rotSpeed;
-                }
-                if (schoolKeys.right) {
-                    schoolPlayer.angle += schoolPlayer.rotSpeed;
-                }
-
+                // 1. Controls & Player Movement in 3D (Forward, Backward, Strafe Left, Strafe Right)
                 let moveStep = 0;
+                let strafeStep = 0;
+
                 if (schoolKeys.up) moveStep += schoolPlayer.speed;
                 if (schoolKeys.down) moveStep -= schoolPlayer.speed;
+                if (schoolKeys.left) strafeStep -= schoolPlayer.speed;
+                if (schoolKeys.right) strafeStep += schoolPlayer.speed;
 
-                if (moveStep !== 0) {
-                    const nextX = schoolPlayer.x + Math.cos(schoolPlayer.angle) * moveStep;
-                    const nextY = schoolPlayer.y + Math.sin(schoolPlayer.angle) * moveStep;
+                if (moveStep !== 0 || strafeStep !== 0) {
+                    // Combine forward/backward movement with strafing relative to camera angle
+                    const forwardX = Math.cos(schoolPlayer.angle) * moveStep;
+                    const forwardY = Math.sin(schoolPlayer.angle) * moveStep;
+                    // Strafe vector is perpendicular: angle + 90 degrees
+                    const strafeX = Math.cos(schoolPlayer.angle + Math.PI / 2) * strafeStep;
+                    const strafeY = Math.sin(schoolPlayer.angle + Math.PI / 2) * strafeStep;
 
-                    // Wall Collision with margin
+                    let totalDx = forwardX + strafeX;
+                    let totalDy = forwardY + strafeY;
+
+                    // Normalize diagonal movement
+                    if (moveStep !== 0 && strafeStep !== 0) {
+                        totalDx *= 0.7071;
+                        totalDy *= 0.7071;
+                    }
+
                     const margin = 0.22;
-                    const checkX = schoolPlayer.x + Math.cos(schoolPlayer.angle) * (moveStep + Math.sign(moveStep) * margin);
-                    const checkY = schoolPlayer.y + Math.sin(schoolPlayer.angle) * (moveStep + Math.sign(moveStep) * margin);
+                    const checkX = schoolPlayer.x + totalDx + Math.sign(totalDx) * margin;
+                    const checkY = schoolPlayer.y + totalDy + Math.sign(totalDy) * margin;
 
                     if (!isBlockingWall(checkX, schoolPlayer.y)) {
-                        schoolPlayer.x = nextX;
+                        schoolPlayer.x += totalDx;
                     }
                     if (!isBlockingWall(schoolPlayer.x, checkY)) {
-                        schoolPlayer.y = nextY;
+                        schoolPlayer.y += totalDy;
                     }
                 }
 
@@ -3623,6 +3677,7 @@
 
                             // Open You Can Think Pad in-game!
                             schoolRunning = false;
+                            if (document.exitPointerLock) document.exitPointerLock();
                             generateMathQuiz();
                             mathQuizModal.classList.remove('hidden');
                             triggerBaldiEmotion('talking');
@@ -3732,19 +3787,31 @@
                     // Colors by wall type:
                     // 1: Iconic Baldi Blue Wall (#1565c0)
                     // 2: Classroom Hallway Yellow Wall (#fbc02d)
-                    // 3: Wood Door (#8d6e63)
+                    // 3: Wood Door with Window & Brass Knob (#8d6e63)
                     let wallColor = '#1565c0';
                     if (hitWallType === 2) wallColor = '#fbc02d';
                     if (hitWallType === 3) wallColor = '#8d6e63';
 
-                    // Distance-based shading / fog effect
-                    const shade = Math.max(0.2, 1 - (correctedDist / maxDist));
                     arcadeCtx.fillStyle = wallColor;
                     arcadeCtx.fillRect(r * colWidth, wallTop, colWidth + 1, wallHeight);
 
-                    // Darken vertical column edges for retro 3D depth
+                    // Authentic classroom door styling: glass window and panel line
                     if (hitWallType === 3) {
-                        arcadeCtx.fillStyle = 'rgba(0,0,0,0.4)';
+                        // Glass panel window on the upper half of the door
+                        const windowTop = wallTop + wallHeight * 0.18;
+                        const windowH = wallHeight * 0.28;
+                        arcadeCtx.fillStyle = '#81d4fa'; // Translucent light blue classroom glass
+                        arcadeCtx.fillRect(r * colWidth + 1, windowTop, colWidth - 1, windowH);
+
+                        // Door knob level highlight
+                        const knobY = wallTop + wallHeight * 0.55;
+                        if (r % 8 === 0) {
+                            arcadeCtx.fillStyle = '#ffd600'; // Brass knob
+                            arcadeCtx.fillRect(r * colWidth, knobY, colWidth + 1, wallHeight * 0.05);
+                        }
+
+                        // Door frame shading
+                        arcadeCtx.fillStyle = 'rgba(0,0,0,0.3)';
                         arcadeCtx.fillRect(r * colWidth + 1, wallTop, 1, wallHeight);
                     }
                 }
@@ -3879,6 +3946,7 @@
             function caughtByBaldi() {
                 playRetroSound('slap');
                 schoolRunning = false;
+                if (document.exitPointerLock) document.exitPointerLock();
                 if (schoolAnimFrame) cancelAnimationFrame(schoolAnimFrame);
 
                 // Show physical HTML Game Over overlay with real restart button
