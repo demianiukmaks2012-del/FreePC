@@ -659,6 +659,49 @@
             display: none !important;
         }
 
+        .arcade-gameover-overlay {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            width: 100%;
+            height: 340px;
+            background: rgba(183, 28, 28, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 12;
+            box-sizing: border-box;
+            padding: 20px;
+        }
+
+        .arcade-gameover-overlay.hidden {
+            display: none !important;
+        }
+
+        .restart-baldi-btn {
+            background: #ffff00;
+            color: #000;
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            font-weight: 900;
+            padding: 12px 24px;
+            border: 5px solid #000;
+            box-shadow: 6px 6px 0 #000;
+            cursor: pointer;
+            text-transform: uppercase;
+            animation: startBtnPulse 1.1s infinite alternate;
+            margin-top: 14px;
+        }
+        .restart-baldi-btn:hover {
+            background: #76ff03;
+            transform: scale(1.05);
+        }
+        .restart-baldi-btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: 2px 2px 0 #000;
+        }
+
         .real-start-btn {
             background: #76ff03;
             color: #000;
@@ -1508,7 +1551,23 @@
                         </div>
                     </div>
 
-                    <canvas id="arcadeCanvas" width="560" height="340"></canvas>
+                    <!-- Overlay Game Over Screen with Clickable Restart Button -->
+                    <div id="schoolhouseGameOverOverlay" class="arcade-gameover-overlay hidden">
+                        <div style="font-family: 'Courier New', monospace; font-size: 28px; font-weight: 900; color: #ffff00; margin-bottom: 8px; text-shadow: 3px 3px 0 #000;">
+                            📏 БАЛДІ СПІЙМАВ ТЕБЕ! 📏
+                        </div>
+                        <div id="gameOverStatsSummary" style="font-family: 'Courier New', monospace; font-size: 17px; font-weight: bold; color: #ffffff; margin-bottom: 10px;">
+                            Зібрано: 0 з 5 зошитів!
+                        </div>
+                        <div style="font-family: 'Comic Sans MS', sans-serif; font-size: 14px; font-weight: bold; color: #ffeb3b; margin-bottom: 12px; max-width: 420px; text-align: center;">
+                            «Ляск-ляск лінійкою! Ніхто не втече з моєї 3D школи без розв'язаних уроків!»
+                        </div>
+                        <button type="button" class="restart-baldi-btn" id="restartBaldiBtn">
+                            🔄 ПОВТОРНИЙ СТАРТ / RESTART
+                        </button>
+                    </div>
+
+                    <canvas id="arcadeCanvas" width="560" height="340" tabindex="0"></canvas>
 
                     <!-- Touch Controls for Mobile / Tablets -->
                     <div class="arcade-controls-panel" id="arcadeCatcherControls">
@@ -3191,9 +3250,12 @@
 
             const arcadeStartBtn = document.getElementById('arcadeStartBtn');
             const realStartBtn = document.getElementById('realStartBtn');
+            const restartBaldiBtn = document.getElementById('restartBaldiBtn');
             const startBaldiGameBtn = document.getElementById('startBaldiGameBtn');
             const arcadeSchoolStartBtn = startBaldiGameBtn; // Alias for backward compatibility
             const schoolhouseSplashOverlay = document.getElementById('schoolhouseSplashOverlay');
+            const schoolhouseGameOverOverlay = document.getElementById('schoolhouseGameOverOverlay');
+            const gameOverStatsSummary = document.getElementById('gameOverStatsSummary');
             const arcadeLeftBtn = document.getElementById('arcadeLeftBtn');
             const arcadeRightBtn = document.getElementById('arcadeRightBtn');
 
@@ -3470,6 +3532,7 @@
             /* ---------- Mode 2 Engine (Pseudo-3D Raycasting Baldi Schoolhouse) ---------- */
             function startSchoolhouseGame() {
                 if (schoolhouseSplashOverlay) schoolhouseSplashOverlay.classList.add('hidden');
+                if (schoolhouseGameOverOverlay) schoolhouseGameOverOverlay.classList.add('hidden');
                 schoolRunning = true;
                 notebooksCollected = 0;
                 baldiAngerLevel = 1;
@@ -3487,10 +3550,12 @@
                 triggerBaldiEmotion('talking');
                 updateBaldiSpeech("Ласкаво просимо до моєї 3D школи! Знайди 5 зошитів та тікай від мене!");
                 if (schoolAnimFrame) cancelAnimationFrame(schoolAnimFrame);
+                if (arcadeCanvas) arcadeCanvas.focus();
                 schoolhouseLoop();
             }
 
             if (realStartBtn) realStartBtn.addEventListener('click', startSchoolhouseGame);
+            if (restartBaldiBtn) restartBaldiBtn.addEventListener('click', startSchoolhouseGame);
             if (startBaldiGameBtn) startBaldiGameBtn.addEventListener('click', startSchoolhouseGame);
 
             function isBlockingWall(x, y) {
@@ -3815,6 +3880,15 @@
                 playRetroSound('slap');
                 schoolRunning = false;
                 if (schoolAnimFrame) cancelAnimationFrame(schoolAnimFrame);
+
+                // Show physical HTML Game Over overlay with real restart button
+                if (schoolhouseGameOverOverlay) {
+                    if (gameOverStatsSummary) {
+                        gameOverStatsSummary.textContent = `Ти зібрав ${notebooksCollected} з ${TOTAL_NOTEBOOKS} зошитів!`;
+                    }
+                    schoolhouseGameOverOverlay.classList.remove('hidden');
+                }
+
                 arcadeCtx.fillStyle = 'rgba(211, 47, 47, 0.9)';
                 arcadeCtx.fillRect(0, 0, arcadeCanvas.width, arcadeCanvas.height);
 
@@ -3822,15 +3896,6 @@
                 arcadeCtx.font = '900 32px "Courier New", sans-serif';
                 arcadeCtx.textAlign = 'center';
                 arcadeCtx.fillText("БАЛДІ СПІЙМАВ ТЕБЕ! 📏", arcadeCanvas.width / 2, 130);
-
-                arcadeCtx.fillStyle = '#fff';
-                arcadeCtx.font = 'bold 18px "Courier New", sans-serif';
-                arcadeCtx.fillText(`Ти зібрав лише ${notebooksCollected} з ${TOTAL_NOTEBOOKS} зошитів!`, arcadeCanvas.width / 2, 180);
-
-                arcadeCtx.fillStyle = '#000';
-                arcadeCtx.font = 'bold 15px "Comic Sans MS", sans-serif';
-                arcadeCtx.fillText("Натисніть «НОВА ШКОЛА» для повторної спроби!", arcadeCanvas.width / 2, 230);
-                arcadeCtx.textAlign = 'left';
 
                 triggerBaldiEmotion('angry');
                 updateBaldiSpeech("Ляск-ляск лінійкою! Ніхто не втече зі школи без усіх розв'язаних зошитів!");
@@ -3877,30 +3942,66 @@
                 arcadeCtx.textAlign = 'left';
             }
 
-            // Global Keyboard Router for Both Modes
+            // Global Keyboard Router for Both Modes (code & key support)
             window.addEventListener('keydown', (e) => {
                 if (state.currentView !== 'arcade') return;
+                // If focus is inside an input element, do not capture WASD
+                if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) return;
+
+                const code = e.code;
+                const key = e.key ? e.key.toLowerCase() : '';
 
                 if (currentGameMode === 'catcher') {
-                    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') arcadeKeys.left = true;
-                    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') arcadeKeys.right = true;
+                    if (code === 'ArrowLeft' || code === 'KeyA' || key === 'arrowleft' || key === 'a' || key === 'ф') {
+                        arcadeKeys.left = true;
+                    }
+                    if (code === 'ArrowRight' || code === 'KeyD' || key === 'arrowright' || key === 'd' || key === 'в') {
+                        arcadeKeys.right = true;
+                    }
                 } else if (currentGameMode === 'schoolhouse') {
-                    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') schoolKeys.left = true;
-                    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') schoolKeys.right = true;
-                    if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') schoolKeys.up = true;
-                    if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') schoolKeys.down = true;
+                    if (code === 'ArrowLeft' || code === 'KeyA' || key === 'arrowleft' || key === 'a' || key === 'ф') {
+                        schoolKeys.left = true;
+                        e.preventDefault();
+                    }
+                    if (code === 'ArrowRight' || code === 'KeyD' || key === 'arrowright' || key === 'd' || key === 'в') {
+                        schoolKeys.right = true;
+                        e.preventDefault();
+                    }
+                    if (code === 'ArrowUp' || code === 'KeyW' || key === 'arrowup' || key === 'w' || key === 'ц') {
+                        schoolKeys.up = true;
+                        e.preventDefault();
+                    }
+                    if (code === 'ArrowDown' || code === 'KeyS' || key === 'arrowdown' || key === 's' || key === 'і' || key === 'ы') {
+                        schoolKeys.down = true;
+                        e.preventDefault();
+                    }
                 }
             });
 
             window.addEventListener('keyup', (e) => {
+                const code = e.code;
+                const key = e.key ? e.key.toLowerCase() : '';
+
                 if (currentGameMode === 'catcher') {
-                    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') arcadeKeys.left = false;
-                    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') arcadeKeys.right = false;
+                    if (code === 'ArrowLeft' || code === 'KeyA' || key === 'arrowleft' || key === 'a' || key === 'ф') {
+                        arcadeKeys.left = false;
+                    }
+                    if (code === 'ArrowRight' || code === 'KeyD' || key === 'arrowright' || key === 'd' || key === 'в') {
+                        arcadeKeys.right = false;
+                    }
                 } else if (currentGameMode === 'schoolhouse') {
-                    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') schoolKeys.left = false;
-                    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') schoolKeys.right = false;
-                    if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') schoolKeys.up = false;
-                    if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') schoolKeys.down = false;
+                    if (code === 'ArrowLeft' || code === 'KeyA' || key === 'arrowleft' || key === 'a' || key === 'ф') {
+                        schoolKeys.left = false;
+                    }
+                    if (code === 'ArrowRight' || code === 'KeyD' || key === 'arrowright' || key === 'd' || key === 'в') {
+                        schoolKeys.right = false;
+                    }
+                    if (code === 'ArrowUp' || code === 'KeyW' || key === 'arrowup' || key === 'w' || key === 'ц') {
+                        schoolKeys.up = false;
+                    }
+                    if (code === 'ArrowDown' || code === 'KeyS' || key === 'arrowdown' || key === 's' || key === 'і' || key === 'ы') {
+                        schoolKeys.down = false;
+                    }
                 }
             });
 
