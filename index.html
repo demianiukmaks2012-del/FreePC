@@ -476,6 +476,124 @@
             }
         }
 
+        /* Mobile Responsive Navigation Bar (Hamburger Menu) */
+        .mobile-header-bar {
+            display: none;
+            background-color: #ffd600;
+            border-bottom: 4px solid #000;
+            padding: 8px 12px;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 200;
+            position: sticky;
+            top: 0;
+        }
+
+        .mobile-menu-btn {
+            background-color: #000;
+            color: #fff;
+            border: 3px solid #000;
+            padding: 6px 12px;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 2px 2px 0 #fff;
+        }
+
+        @media (max-width: 900px) {
+            .mobile-header-bar {
+                display: flex;
+            }
+
+            .sidebar {
+                display: none; /* Collapsible on mobile */
+                width: 100%;
+                min-width: 100%;
+                height: auto;
+                max-height: 80vh;
+                border-right: none;
+                border-bottom: 5px solid #000;
+                position: relative;
+                z-index: 100;
+            }
+
+            .sidebar.mobile-open {
+                display: flex;
+            }
+        }
+
+        /* Arcade Banner & Arcade Room Styles */
+        .arcade-banner-box {
+            background-color: #d50000;
+            color: #ffff00;
+            border: 5px solid #000;
+            box-shadow: 6px 6px 0 #000;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: arcadeFlash 0.9s infinite alternate;
+        }
+        @keyframes arcadeFlash {
+            0% { border-color: #000; background-color: #d50000; color: #ffff00; }
+            100% { border-color: #ffff00; background-color: #000000; color: #76ff03; }
+        }
+
+        .arcade-canvas-container {
+            background: #000;
+            border: 5px solid #000;
+            box-shadow: 6px 6px 0 #000;
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        #arcadeCanvas {
+            background: #111;
+            display: block;
+            margin: 0 auto;
+            image-rendering: pixelated;
+            border-bottom: 4px solid #333;
+        }
+
+        .arcade-controls-panel {
+            background: #212121;
+            padding: 12px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 3px solid #000;
+        }
+
+        .arcade-touch-btn {
+            background: #ff1744;
+            color: #fff;
+            border: 4px solid #000;
+            padding: 12px 24px;
+            font-size: 20px;
+            font-weight: 900;
+            box-shadow: 3px 3px 0 #000, inset 2px 2px 0 rgba(255,255,255,0.4);
+            cursor: pointer;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        .arcade-touch-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 #000;
+        }
+
+        .btn-arcade {
+            background-color: #e040fb !important;
+            color: #fff !important;
+            animation: arcadeBtnPulse 1.4s infinite alternate;
+        }
+        @keyframes arcadeBtnPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.02); box-shadow: 5px 5px 0 #ffea00; }
+        }
+
         /* Detailed 2D PC Station (Stage 3.2) */
         .pc-station {
             background: #c8e6c9;
@@ -1019,9 +1137,19 @@
     <!-- CRT TV Screen Effect Overlay (Stage 7.1) -->
     <div class="crt-overlay" id="crtOverlay"></div>
 
+    <!-- Mobile Top Navigation Header -->
+    <div class="mobile-header-bar">
+        <div style="font-weight: 900; font-size: 16px; color: #000;">
+            🏫 FreePC • Baldi 1999
+        </div>
+        <button type="button" class="mobile-menu-btn" id="mobileMenuToggleBtn">
+            ☰ МЕНЮ
+        </button>
+    </div>
+
     <div class="app-container">
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="appSidebar">
             <div>
                 <div class="sidebar-header">
                     <h1 class="main-title">FreePC System</h1>
@@ -1038,6 +1166,9 @@
                     </button>
                     <button class="retro-btn btn-plan nav-tab" data-target="plan">
                         <span>2D План класу</span> <span>🖥️</span>
+                    </button>
+                    <button class="retro-btn btn-arcade nav-tab" data-target="arcade">
+                        <span>🕹️ Baldi Arcade</span> <span>⭐</span>
                     </button>
                     <button class="retro-btn btn-bookings nav-tab" data-target="bookings">
                         <span>Мої бронювання</span> <span>📋</span>
@@ -1165,6 +1296,19 @@
                     <span style="font-size: 16px; background: #000; color: #fff; padding: 2px 8px;">2D Top-Down</span>
                 </div>
 
+                <!-- Arcade Banner When All PCs in Current Class are Full -->
+                <div id="noPcsArcadeBanner" class="arcade-banner-box hidden">
+                    <div style="font-size: 22px; font-weight: 900; margin-bottom: 6px;">
+                        🚨 ВСІ КОМП'ЮТЕРИ ЗАЙНЯТІ! ВІЛЬНИХ МІСЦЬ НЕМАЄ!
+                    </div>
+                    <p style="font-size: 15px; font-weight: bold; margin-bottom: 12px; color: #fff;">
+                        Щоб не сумувати в черзі, завітай до «BALDI'S NOTEBOOK CHALLENGE»!
+                    </p>
+                    <button type="button" id="bannerGoToArcadeBtn" class="retro-btn btn-arcade" style="margin: 0 auto; display: inline-flex; font-size: 17px; padding: 10px 20px;">
+                        🕹️ ГРАТИ В BALDI ARCADE ЗАРАЗ! ➔
+                    </button>
+                </div>
+
                 <!-- Green Chalkboard with Secret Admin Trigger (Stage 5.2 & 6.1) -->
                 <div class="school-board" id="schoolChalkboard" title="Подвійний клік відкриває панель викладача!">
                     <div>📐 ШКІЛЬНА ДОШКА ВИКЛАДАЧА БАЛДІ 📐</div>
@@ -1225,6 +1369,43 @@
                     <div class="legend-item"><span class="legend-dot" style="background:#fff59d;"></span> 🟡 Твій заброньований ПК (пульсує)</div>
                     <div class="legend-item"><span class="legend-dot" style="background:#e0e0e0;"></span> ⚪ На ремонті (Out of Order)</div>
                     <div class="legend-item"><span class="legend-dot" style="background:#ff1744;"></span> 🔴 Пунктир: підходить за фільтром ПЗ</div>
+                </div>
+            </section>
+
+            <!-- 3.5. BALDI ARCADE ROOM (ENTERTAINMENT WHEN NO PCS LEFT) -->
+            <section id="arcadeView" class="view-section card-box hidden" style="width: 100%; max-width: 100%; text-align: center;">
+                <div class="section-title" style="color: #c2185b;">
+                    <span>🕹️ Ігрова Кімната: «Baldi's Notebook Challenge»</span>
+                    <span style="font-size: 14px; background: #000; color: #76ff03; padding: 2px 8px;">ARCADE-1999</span>
+                </div>
+
+                <div style="background: #fff9c4; border: 3px solid #000; padding: 10px; margin-bottom: 15px; font-weight: bold; font-size: 14px;">
+                    🎯 <strong>Правила гри:</strong> Керуй кошиком учня (← та → або кнопки на екрані). Лови зошити (+10 балів), збирай лінійки (+25 балів) та уникай гнівного Балді!
+                </div>
+
+                <div class="arcade-canvas-container">
+                    <div style="display: flex; justify-content: space-between; background: #000; color: #76ff03; padding: 8px 14px; font-family: 'Courier New', monospace; font-size: 18px; font-weight: 900; border-bottom: 3px solid #333;">
+                        <span>РАХУНОК: <span id="arcadeScore">0</span></span>
+                        <span>РЕКОРД: <span id="arcadeHighScore">0</span></span>
+                        <span>ЖИТТЯ: <span id="arcadeLives">❤️❤️❤️</span></span>
+                    </div>
+
+                    <canvas id="arcadeCanvas" width="560" height="340"></canvas>
+
+                    <!-- Touch Controls for Mobile / Tablets -->
+                    <div class="arcade-controls-panel">
+                        <button type="button" class="arcade-touch-btn" id="arcadeLeftBtn">◀ ВЛІВО</button>
+                        <button type="button" class="retro-btn" id="arcadeStartBtn" style="background: #76ff03; color: #000; font-size: 16px; padding: 8px 18px;">
+                            СТАРТ ГРИ
+                        </button>
+                        <button type="button" class="arcade-touch-btn" id="arcadeRightBtn">ВПРАВО ▶</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <button type="button" class="retro-btn btn-plan" onclick="document.querySelector('[data-target=\'plan\']').click()" style="display: inline-flex; font-size: 16px;">
+                        ← Повернутися до плану кабінету
+                    </button>
                 </div>
             </section>
 
@@ -1949,10 +2130,27 @@
                 if (viewName === 'admin') renderAdminView();
             }
 
+            // Mobile Hamburger Menu Toggle
+            const mobileMenuToggleBtn = document.getElementById('mobileMenuToggleBtn');
+            const appSidebar = document.getElementById('appSidebar');
+            if (mobileMenuToggleBtn && appSidebar) {
+                mobileMenuToggleBtn.addEventListener('click', () => {
+                    appSidebar.classList.toggle('mobile-open');
+                    mobileMenuToggleBtn.textContent = appSidebar.classList.contains('mobile-open') ? '✕ ЗАКРИТИ' : '☰ МЕНЮ';
+                });
+            }
+
             navTabs.forEach(tab => {
                 tab.addEventListener('click', () => {
+                    if (window.innerWidth <= 900 && appSidebar) {
+                        appSidebar.classList.remove('mobile-open');
+                        if (mobileMenuToggleBtn) mobileMenuToggleBtn.textContent = '☰ МЕНЮ';
+                    }
                     if (tab.dataset.target === 'plan') {
                         openCabinetPlan(state.activeCabinet);
+                    } else if (tab.dataset.target === 'arcade') {
+                        switchView('arcade');
+                        startArcadeGame();
                     } else {
                         switchView(tab.dataset.target);
                     }
@@ -2061,6 +2259,15 @@
             /* =========================================================
                7. 2D CLASSROOM RENDERER (Stage 3.1 & 3.2 & Stage 4)
                ========================================================= */
+            const noPcsArcadeBanner = document.getElementById('noPcsArcadeBanner');
+            const bannerGoToArcadeBtn = document.getElementById('bannerGoToArcadeBtn');
+            if (bannerGoToArcadeBtn) {
+                bannerGoToArcadeBtn.addEventListener('click', () => {
+                    switchView('arcade');
+                    startArcadeGame();
+                });
+            }
+
             function render2DClassroom() {
                 deskRowsGrid.innerHTML = '';
                 const cabData = state.classrooms[state.activeCabinet];
@@ -2068,6 +2275,27 @@
 
                 const filterSw = softwareFilterSelect.value;
                 const occupiedMap = state.occupiedPcs[state.activeCabinet] || {};
+
+                let availableCount = 0;
+                cabData.pcs.forEach(pc => {
+                    const isMine = state.booking && state.booking.cabinet === state.activeCabinet && state.booking.pcId === pc.id;
+                    const isOccupied = !isMine && occupiedMap[pc.id];
+                    const isUnderRepair = pc.repair;
+                    if (!isOccupied && !isUnderRepair) {
+                        availableCount++;
+                    }
+                });
+
+                // Display Arcade Banner when 0 free PCs remain
+                if (noPcsArcadeBanner) {
+                    if (availableCount === 0 && cabData.pcs.length > 0) {
+                        noPcsArcadeBanner.classList.remove('hidden');
+                        triggerBaldiEmotion('talking');
+                        updateBaldiSpeech("У кабінеті не залишилось вільних комп'ютерів! Зіграй у Baldi Arcade!");
+                    } else {
+                        noPcsArcadeBanner.classList.add('hidden');
+                    }
+                }
 
                 cabData.pcs.forEach(pc => {
                     const isMine = state.booking && state.booking.cabinet === state.activeCabinet && state.booking.pcId === pc.id;
@@ -2730,6 +2958,205 @@
                     updateBaldiSpeech("Усі комп'ютерні класи очищено! Усі місця вільні для нового уроку!");
                 }
             });
+
+            /* =========================================================
+               12.5 BALDI ARCADE ROOM MINI-GAME ENGINE
+               ========================================================= */
+            const arcadeCanvas = document.getElementById('arcadeCanvas');
+            const arcadeCtx = arcadeCanvas ? arcadeCanvas.getContext('2d') : null;
+            const arcadeScoreEl = document.getElementById('arcadeScore');
+            const arcadeHighScoreEl = document.getElementById('arcadeHighScore');
+            const arcadeLivesEl = document.getElementById('arcadeLives');
+            const arcadeStartBtn = document.getElementById('arcadeStartBtn');
+            const arcadeLeftBtn = document.getElementById('arcadeLeftBtn');
+            const arcadeRightBtn = document.getElementById('arcadeRightBtn');
+
+            let arcadeRunning = false;
+            let arcadeScore = 0;
+            let arcadeHighScore = safeGetJSON('freePC_arcade_highscore', 0);
+            if (arcadeHighScoreEl) arcadeHighScoreEl.textContent = arcadeHighScore;
+            let arcadeLives = 3;
+            let playerBasket = { x: 240, y: 300, width: 80, height: 20, speed: 7 };
+            let arcadeItems = [];
+            let itemSpawnTimer = 0;
+            let arcadeKeys = { left: false, right: false };
+            let arcadeAnimFrame = null;
+
+            function startArcadeGame() {
+                arcadeRunning = true;
+                arcadeScore = 0;
+                arcadeLives = 3;
+                arcadeItems = [];
+                itemSpawnTimer = 0;
+                playerBasket.x = (arcadeCanvas.width - playerBasket.width) / 2;
+                if (arcadeScoreEl) arcadeScoreEl.textContent = '0';
+                if (arcadeLivesEl) arcadeLivesEl.textContent = '❤️❤️❤️';
+                if (arcadeStartBtn) arcadeStartBtn.textContent = 'РЕСТАРТ';
+                triggerBaldiEmotion('talking');
+                updateBaldiSpeech("Лови сині зошити та золоті лінійки! Не лови злого Балді!");
+                if (arcadeAnimFrame) cancelAnimationFrame(arcadeAnimFrame);
+                arcadeLoop();
+            }
+
+            if (arcadeStartBtn) arcadeStartBtn.addEventListener('click', startArcadeGame);
+
+            // Desktop Keyboard Controls
+            window.addEventListener('keydown', (e) => {
+                if (state.currentView !== 'arcade') return;
+                if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') arcadeKeys.left = true;
+                if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') arcadeKeys.right = true;
+            });
+            window.addEventListener('keyup', (e) => {
+                if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') arcadeKeys.left = false;
+                if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') arcadeKeys.right = false;
+            });
+
+            // Mobile Touch Controls
+            if (arcadeLeftBtn && arcadeRightBtn) {
+                const addHoldListener = (el, dir) => {
+                    const start = (ev) => { ev.preventDefault(); arcadeKeys[dir] = true; };
+                    const end = (ev) => { ev.preventDefault(); arcadeKeys[dir] = false; };
+                    el.addEventListener('mousedown', start);
+                    el.addEventListener('mouseup', end);
+                    el.addEventListener('mouseleave', end);
+                    el.addEventListener('touchstart', start, { passive: false });
+                    el.addEventListener('touchend', end, { passive: false });
+                };
+                addHoldListener(arcadeLeftBtn, 'left');
+                addHoldListener(arcadeRightBtn, 'right');
+            }
+
+            function spawnArcadeItem() {
+                const types = [
+                    { type: 'notebook', label: '📘', points: 10, speed: 3.2, harmful: false, size: 28 },
+                    { type: 'ruler', label: '📏', points: 25, speed: 4.5, harmful: false, size: 28 },
+                    { type: 'baldi_angry', label: '😠', points: 0, speed: 3.8, harmful: true, size: 30 }
+                ];
+                const randType = Math.random() < 0.28 ? types[2] : (Math.random() < 0.35 ? types[1] : types[0]);
+                arcadeItems.push({
+                    x: Math.random() * (arcadeCanvas.width - 40) + 10,
+                    y: -30,
+                    ...randType
+                });
+            }
+
+            function arcadeLoop() {
+                if (!arcadeRunning || !arcadeCtx) return;
+
+                // Move Player Basket
+                if (arcadeKeys.left && playerBasket.x > 0) playerBasket.x -= playerBasket.speed;
+                if (arcadeKeys.right && playerBasket.x < arcadeCanvas.width - playerBasket.width) playerBasket.x += playerBasket.speed;
+
+                // Spawn Items
+                itemSpawnTimer++;
+                if (itemSpawnTimer % 45 === 0) spawnArcadeItem();
+
+                // Clear Canvas (Retro 90s Grid Room)
+                arcadeCtx.fillStyle = '#000080'; // Windows 95 classic deep blue
+                arcadeCtx.fillRect(0, 0, arcadeCanvas.width, arcadeCanvas.height);
+
+                // Pixelated Classroom Floor Lines
+                arcadeCtx.strokeStyle = '#0000cd';
+                arcadeCtx.lineWidth = 2;
+                for (let x = 0; x < arcadeCanvas.width; x += 40) {
+                    arcadeCtx.beginPath();
+                    arcadeCtx.moveTo(x, 0);
+                    arcadeCtx.lineTo(x, arcadeCanvas.height);
+                    arcadeCtx.stroke();
+                }
+
+                // Draw Basket
+                arcadeCtx.fillStyle = '#ffff00';
+                arcadeCtx.fillRect(playerBasket.x, playerBasket.y, playerBasket.width, playerBasket.height);
+                arcadeCtx.strokeStyle = '#000';
+                arcadeCtx.lineWidth = 3;
+                arcadeCtx.strokeRect(playerBasket.x, playerBasket.y, playerBasket.width, playerBasket.height);
+                arcadeCtx.fillStyle = '#000';
+                arcadeCtx.font = 'bold 12px "Courier New"';
+                arcadeCtx.fillText("ПОРТФЕЛЬ", playerBasket.x + 8, playerBasket.y + 14);
+
+                // Update & Draw Items
+                for (let i = arcadeItems.length - 1; i >= 0; i--) {
+                    const item = arcadeItems[i];
+                    item.y += item.speed;
+
+                    // Draw Item Emoji
+                    arcadeCtx.font = `${item.size}px sans-serif`;
+                    arcadeCtx.fillText(item.label, item.x, item.y);
+
+                    // Check Collision with Basket
+                    if (
+                        item.y >= playerBasket.y - 10 &&
+                        item.y <= playerBasket.y + playerBasket.height &&
+                        item.x + item.size >= playerBasket.x &&
+                        item.x <= playerBasket.x + playerBasket.width
+                    ) {
+                        if (item.harmful) {
+                            arcadeLives--;
+                            triggerBaldiEmotion('angry');
+                            if (arcadeLives <= 0) {
+                                gameOverArcade();
+                                return;
+                            } else {
+                                arcadeLivesEl.textContent = '❤️'.repeat(arcadeLives);
+                                updateBaldiSpeech("Ай! Балді вдарив лінійкою! Будь уважнішим!");
+                            }
+                        } else {
+                            arcadeScore += item.points;
+                            arcadeScoreEl.textContent = arcadeScore;
+                            if (arcadeScore > arcadeHighScore) {
+                                arcadeHighScore = arcadeScore;
+                                arcadeHighScoreEl.textContent = arcadeHighScore;
+                                safeSetJSON('freePC_arcade_highscore', arcadeHighScore);
+                            }
+                        }
+                        arcadeItems.splice(i, 1);
+                        continue;
+                    }
+
+                    // Remove off-screen items
+                    if (item.y > arcadeCanvas.height + 40) {
+                        arcadeItems.splice(i, 1);
+                    }
+                }
+
+                arcadeAnimFrame = requestAnimationFrame(arcadeLoop);
+            }
+
+            function gameOverArcade() {
+                arcadeRunning = false;
+                if (arcadeAnimFrame) cancelAnimationFrame(arcadeAnimFrame);
+                arcadeLivesEl.textContent = '💀 КІНЕЦЬ';
+                arcadeCtx.fillStyle = 'rgba(0,0,0,0.85)';
+                arcadeCtx.fillRect(0, 0, arcadeCanvas.width, arcadeCanvas.height);
+                arcadeCtx.fillStyle = '#ff1744';
+                arcadeCtx.font = '900 32px "Courier New", sans-serif';
+                arcadeCtx.textAlign = 'center';
+                arcadeCtx.fillText("ГРУ ЗАКІНЧЕНО!", arcadeCanvas.width / 2, 140);
+                arcadeCtx.fillStyle = '#fff';
+                arcadeCtx.font = 'bold 20px "Courier New", sans-serif';
+                arcadeCtx.fillText(`ТВІЙ РАХУНОК: ${arcadeScore}`, arcadeCanvas.width / 2, 185);
+                arcadeCtx.fillStyle = '#76ff03';
+                arcadeCtx.font = 'bold 15px "Comic Sans MS", sans-serif';
+                arcadeCtx.fillText("Натисніть 'РЕСТАРТ', щоб зіграти знову!", arcadeCanvas.width / 2, 230);
+                arcadeCtx.textAlign = 'left';
+                triggerBaldiEmotion('angry');
+                updateBaldiSpeech(`Гру завершено! Ти зібрав ${arcadeScore} балів! Перевір, можливо якийсь ПК вже звільнився.`);
+            }
+
+            // Initial render of Arcade screen on load
+            if (arcadeCanvas && arcadeCtx) {
+                arcadeCtx.fillStyle = '#000080';
+                arcadeCtx.fillRect(0, 0, arcadeCanvas.width, arcadeCanvas.height);
+                arcadeCtx.fillStyle = '#76ff03';
+                arcadeCtx.font = '900 24px "Courier New"';
+                arcadeCtx.textAlign = 'center';
+                arcadeCtx.fillText("BALDI'S NOTEBOOK CHALLENGE", arcadeCanvas.width / 2, 140);
+                arcadeCtx.fillStyle = '#fff';
+                arcadeCtx.font = 'bold 16px "Comic Sans MS"';
+                arcadeCtx.fillText("Натисніть «СТАРТ ГРИ» нижче!", arcadeCanvas.width / 2, 180);
+                arcadeCtx.textAlign = 'left';
+            }
 
             // Reset Default Layouts 101/102
             adminResetDefaultLayoutsBtn.addEventListener('click', () => {
