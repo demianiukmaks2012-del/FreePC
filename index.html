@@ -1504,7 +1504,7 @@
                             ▶ START GAME / ПОЧАТИ ГРУ
                         </button>
                         <div style="font-size: 12px; color: #76ff03; font-weight: bold; margin-top: 15px; font-family: 'Courier New', monospace;">
-                            [Керування: Клавіші W, A, S, D або Стрілки на клавіатурі / D-Pad знизу]
+                            [Керування 3D: W/▲ Вперед, S/▼ Назад, A/◄ Поворот вліво, D/► Поворот вправо]
                         </div>
                     </div>
 
@@ -1534,7 +1534,7 @@
                                 START GAME / НОВА ШКОЛА
                             </button>
                             <div style="font-size: 12px; color: #fff; font-weight: bold; background: #000; padding: 2px 6px;">
-                                Керування: WASD / Стрілки / D-Pad
+                                Керування 3D: WASD / Стрілки / D-Pad
                             </div>
                         </div>
                     </div>
@@ -3216,7 +3216,7 @@
             let arcadeKeys = { left: false, right: false };
             let arcadeAnimFrame = null;
 
-            /* ---------- Mode 2: Classic Baldi Schoolhouse State ---------- */
+            /* ---------- Mode 2: Classic Baldi Schoolhouse Pseudo-3D Engine ---------- */
             let schoolRunning = false;
             let schoolAnimFrame = null;
             let notebooksCollected = 0;
@@ -3224,32 +3224,57 @@
             let baldiSchoolRulerTimer = 0;
             let baldiAngerLevel = 1; // Baldi moves faster as more notebooks collected
 
-            let schoolPlayer = { x: 40, y: 160, size: 20, speed: 4 };
-            let schoolBaldi = { x: 500, y: 160, size: 26, speed: 1.6 };
-
-            // Schoolhouse Map: Walls & Notebook Desks (Tile grid layout)
-            const schoolWalls = [
-                // Outer boundary
-                { x: 0, y: 0, w: 560, h: 14 },
-                { x: 0, y: 326, w: 560, h: 14 },
-                { x: 0, y: 0, w: 14, h: 340 },
-                { x: 546, y: 0, w: 14, h: 340 },
-                // Classrooms dividing interior walls with doorways
-                { x: 140, y: 14, w: 12, h: 100 },
-                { x: 140, y: 180, w: 12, h: 146 },
-                { x: 280, y: 14, w: 12, h: 80 },
-                { x: 280, y: 150, w: 12, h: 80 },
-                { x: 280, y: 270, w: 12, h: 56 },
-                { x: 420, y: 14, w: 12, h: 110 },
-                { x: 420, y: 190, w: 12, h: 136 }
+            // 16x10 Grid Map for Pseudo-3D Raycasting
+            // 0: Floor / Hallway / Classroom interior
+            // 1: Blue perimeter & main structural school walls
+            // 2: Yellow hallway classroom walls
+            // 3: Wood/Brown Classroom Doors
+            const MAP_W = 16;
+            const MAP_H = 10;
+            const schoolMap = [
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1,
+                1, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 1,
+                1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1,
+                1, 2, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 1,
+                1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+                1, 2, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 1,
+                1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1,
+                1, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
             ];
 
+            function getMapCell(x, y) {
+                const mx = Math.floor(x);
+                const my = Math.floor(y);
+                if (mx < 0 || mx >= MAP_W || my < 0 || my >= MAP_H) return 1;
+                return schoolMap[my * MAP_W + mx];
+            }
+
+            // Pseudo-3D Player state: grid coordinates, viewing angle and Field of View
+            let schoolPlayer = {
+                x: 2.5,
+                y: 5.5,
+                angle: 0, // In radians
+                speed: 0.052,
+                rotSpeed: 0.048,
+                fov: Math.PI / 3 // 60 degrees Field of View
+            };
+
+            // Baldi 3D entity state
+            let schoolBaldi = {
+                x: 13.5,
+                y: 5.5,
+                speed: 0.022
+            };
+
+            // 5 Notebook 3D billboard positions inside school classrooms
             let schoolNotebooks = [
-                { id: 1, x: 60, y: 50, collected: false, color: '#00e5ff' },
-                { id: 2, x: 70, y: 260, collected: false, color: '#ffff00' },
-                { id: 3, x: 200, y: 60, collected: false, color: '#ff4081' },
-                { id: 4, x: 340, y: 260, collected: false, color: '#76ff03' },
-                { id: 5, x: 480, y: 70, collected: false, color: '#ff6d00' }
+                { id: 1, x: 2.0, y: 2.0, collected: false, color: '#00e5ff', label: '1' },
+                { id: 2, x: 6.5, y: 2.0, collected: false, color: '#ffff00', label: '2' },
+                { id: 3, x: 10.5, y: 2.0, collected: false, color: '#ff4081', label: '3' },
+                { id: 4, x: 2.0, y: 8.0, collected: false, color: '#76ff03', label: '4' },
+                { id: 5, x: 10.5, y: 8.0, collected: false, color: '#ff6d00', label: '5' }
             ];
 
             let schoolKeys = { up: false, down: false, left: false, right: false };
@@ -3442,24 +3467,25 @@
                 arcadeCtx.textAlign = 'left';
             }
 
-            /* ---------- Mode 2 Engine (Classic Baldi Schoolhouse) ---------- */
+            /* ---------- Mode 2 Engine (Pseudo-3D Raycasting Baldi Schoolhouse) ---------- */
             function startSchoolhouseGame() {
                 if (schoolhouseSplashOverlay) schoolhouseSplashOverlay.classList.add('hidden');
                 schoolRunning = true;
                 notebooksCollected = 0;
                 baldiAngerLevel = 1;
-                schoolPlayer.x = 40;
-                schoolPlayer.y = 160;
-                schoolBaldi.x = 490;
-                schoolBaldi.y = 160;
-                schoolBaldi.speed = 1.6;
+                schoolPlayer.x = 2.5;
+                schoolPlayer.y = 5.5;
+                schoolPlayer.angle = 0;
+                schoolBaldi.x = 13.5;
+                schoolBaldi.y = 5.5;
+                schoolBaldi.speed = 0.022;
 
                 schoolNotebooks.forEach(nb => nb.collected = false);
 
                 if (startBaldiGameBtn) startBaldiGameBtn.textContent = 'ПЕРЕЗАПУСК ШКОЛИ';
                 updateSchoolHeader();
                 triggerBaldiEmotion('talking');
-                updateBaldiSpeech("Знайди всі 5 зошитів у класах та розв'яжи математичні задачі! Тікай від мене!");
+                updateBaldiSpeech("Ласкаво просимо до моєї 3D школи! Знайди 5 зошитів та тікай від мене!");
                 if (schoolAnimFrame) cancelAnimationFrame(schoolAnimFrame);
                 schoolhouseLoop();
             }
@@ -3467,101 +3493,90 @@
             if (realStartBtn) realStartBtn.addEventListener('click', startSchoolhouseGame);
             if (startBaldiGameBtn) startBaldiGameBtn.addEventListener('click', startSchoolhouseGame);
 
-            function checkWallCollision(newX, newY, size) {
-                for (let wall of schoolWalls) {
-                    if (
-                        newX < wall.x + wall.w &&
-                        newX + size > wall.x &&
-                        newY < wall.y + wall.h &&
-                        newY + size > wall.y
-                    ) {
-                        return true;
-                    }
-                }
-                return false;
+            function isBlockingWall(x, y) {
+                const cell = getMapCell(x, y);
+                return cell !== 0;
             }
 
             function schoolhouseLoop() {
                 if (!schoolRunning || !arcadeCtx) return;
 
-                // Move Schoolhouse Player with smooth axis-independent sliding
-                let dx = 0;
-                let dy = 0;
-                if (schoolKeys.left) dx -= schoolPlayer.speed;
-                if (schoolKeys.right) dx += schoolPlayer.speed;
-                if (schoolKeys.up) dy -= schoolPlayer.speed;
-                if (schoolKeys.down) dy += schoolPlayer.speed;
-
-                // Normalize diagonal speed so diagonal movement is not 1.414x faster
-                if (dx !== 0 && dy !== 0) {
-                    dx *= 0.7071;
-                    dy *= 0.7071;
+                // 1. Controls & Player Movement in 3D (Forward, Backward, Left/Right Turn)
+                if (schoolKeys.left) {
+                    schoolPlayer.angle -= schoolPlayer.rotSpeed;
+                }
+                if (schoolKeys.right) {
+                    schoolPlayer.angle += schoolPlayer.rotSpeed;
                 }
 
-                // Check X-axis movement
-                if (dx !== 0 && !checkWallCollision(schoolPlayer.x + dx, schoolPlayer.y, schoolPlayer.size)) {
-                    schoolPlayer.x += dx;
-                }
-                // Check Y-axis movement independently (smooth corner sliding)
-                if (dy !== 0 && !checkWallCollision(schoolPlayer.x, schoolPlayer.y + dy, schoolPlayer.size)) {
-                    schoolPlayer.y += dy;
+                let moveStep = 0;
+                if (schoolKeys.up) moveStep += schoolPlayer.speed;
+                if (schoolKeys.down) moveStep -= schoolPlayer.speed;
+
+                if (moveStep !== 0) {
+                    const nextX = schoolPlayer.x + Math.cos(schoolPlayer.angle) * moveStep;
+                    const nextY = schoolPlayer.y + Math.sin(schoolPlayer.angle) * moveStep;
+
+                    // Wall Collision with margin
+                    const margin = 0.22;
+                    const checkX = schoolPlayer.x + Math.cos(schoolPlayer.angle) * (moveStep + Math.sign(moveStep) * margin);
+                    const checkY = schoolPlayer.y + Math.sin(schoolPlayer.angle) * (moveStep + Math.sign(moveStep) * margin);
+
+                    if (!isBlockingWall(checkX, schoolPlayer.y)) {
+                        schoolPlayer.x = nextX;
+                    }
+                    if (!isBlockingWall(schoolPlayer.x, checkY)) {
+                        schoolPlayer.y = nextY;
+                    }
                 }
 
-                // AI: Baldi pursues the student with authentic slap cadence
+                // 2. Baldi 3D AI Chase & Slap Sound
                 baldiSchoolRulerTimer++;
-                // Step interval decreases as Baldi's anger and speed increase
-                const slapInterval = Math.max(14, Math.floor(48 - (schoolBaldi.speed * 8)));
+                const slapInterval = Math.max(12, Math.floor(45 - (schoolBaldi.speed * 800)));
                 if (baldiSchoolRulerTimer % slapInterval === 0) {
                     playRetroSound('slap');
                 }
 
-                // Path tracking towards player with obstacle avoidance
-                const angle = Math.atan2(schoolPlayer.y - schoolBaldi.y, schoolPlayer.x - schoolBaldi.x);
-                let baldiDx = Math.cos(angle) * schoolBaldi.speed;
-                let baldiDy = Math.sin(angle) * schoolBaldi.speed;
+                const bAngle = Math.atan2(schoolPlayer.y - schoolBaldi.y, schoolPlayer.x - schoolBaldi.x);
+                const bNextX = schoolBaldi.x + Math.cos(bAngle) * schoolBaldi.speed;
+                const bNextY = schoolBaldi.y + Math.sin(bAngle) * schoolBaldi.speed;
 
-                // Wall navigation for Baldi
-                if (!checkWallCollision(schoolBaldi.x + baldiDx, schoolBaldi.y, schoolBaldi.size)) {
-                    schoolBaldi.x += baldiDx;
-                }
-                if (!checkWallCollision(schoolBaldi.x, schoolBaldi.y + baldiDy, schoolBaldi.size)) {
-                    schoolBaldi.y += baldiDy;
-                }
+                if (!isBlockingWall(bNextX, schoolBaldi.y)) schoolBaldi.x = bNextX;
+                if (!isBlockingWall(schoolBaldi.x, bNextY)) schoolBaldi.y = bNextY;
 
-                // Check notebook collection
+                // 3. Notebook Collision Check
                 schoolNotebooks.forEach(nb => {
                     if (!nb.collected) {
-                        const dist = Math.hypot((schoolPlayer.x + schoolPlayer.size / 2) - (nb.x + 10), (schoolPlayer.y + schoolPlayer.size / 2) - (nb.y + 10));
-                        if (dist < 22) {
+                        const dist = Math.hypot(schoolPlayer.x - nb.x, schoolPlayer.y - nb.y);
+                        if (dist < 0.65) {
                             nb.collected = true;
                             notebooksCollected++;
                             baldiAngerLevel++;
-                            schoolBaldi.speed += 0.5; // Baldi steps faster
+                            schoolBaldi.speed += 0.007; // Baldi steps faster in 3D
                             updateSchoolHeader();
                             playRetroSound('notebook');
 
-                            // Trigger authentic You Can Think Pad modal in-game!
+                            // Open You Can Think Pad in-game!
                             schoolRunning = false;
                             generateMathQuiz();
                             mathQuizModal.classList.remove('hidden');
                             triggerBaldiEmotion('talking');
-                            updateBaldiSpeech(`Ти знайшов зошит #${notebooksCollected}! Розв'яжи задачу на Think Pad!`);
+                            updateBaldiSpeech(`Ти знайшов 3D зошит #${notebooksCollected}! Розв'яжи задачу на Think Pad!`);
 
-                            // Hook quiz submission to resume schoolhouse
                             submitQuizBtn.onclick = () => {
                                 const val = parseInt(currentQuizEntered, 10);
                                 if (val === currentQuizAnswer) {
                                     playRetroSound('correct');
                                     mathQuizModal.classList.add('hidden');
                                     triggerBaldiEmotion('celebrate');
-                                    updateBaldiSpeech("Правильно! Зошит зараховано! Швидше шукай наступний, Балді наближається!");
+                                    updateBaldiSpeech("Правильно! 3D зошит зараховано! Швидше шукай наступний!");
                                     schoolRunning = true;
                                     schoolhouseLoop();
                                 } else {
                                     playRetroSound('wrong');
                                     quizFeedback.textContent = "WRONG! BALDI IS GETTING FASTER! 📏";
                                     quizFeedback.style.color = "#d32f2f";
-                                    schoolBaldi.speed += 0.85; // Faster slap frequency on mistakes!
+                                    schoolBaldi.speed += 0.012; // Extra speed penalty for mistakes
                                     baldiAngerLevel = Math.min(5, baldiAngerLevel + 1);
                                     updateSchoolHeader();
                                     triggerBaldiEmotion('angry');
@@ -3571,100 +3586,227 @@
                     }
                 });
 
-                // Check Win Condition: 5 Notebooks Collected
+                // Check Win Condition: All 5 Notebooks collected
                 if (notebooksCollected >= TOTAL_NOTEBOOKS) {
                     schoolRunning = false;
                     winSchoolhouseGame();
                     return;
                 }
 
-                // Check Collision with Baldi: Slapped by ruler!
-                const baldiDist = Math.hypot((schoolPlayer.x + schoolPlayer.size / 2) - (schoolBaldi.x + schoolBaldi.size / 2), (schoolPlayer.y + schoolPlayer.size / 2) - (schoolBaldi.y + schoolBaldi.size / 2));
-                if (baldiDist < 20) {
+                // Check Baldi Caught Player
+                const baldiDist = Math.hypot(schoolPlayer.x - schoolBaldi.x, schoolPlayer.y - schoolBaldi.y);
+                if (baldiDist < 0.5) {
                     caughtByBaldi();
                     return;
                 }
 
-                // Render Schoolhouse Scene (Classic Top-Down View)
-                arcadeCtx.fillStyle = '#fff9bd'; // School tiled linoleum floor
-                arcadeCtx.fillRect(0, 0, arcadeCanvas.width, arcadeCanvas.height);
+                // 4. Pseudo-3D Raycasting Engine (Rendering First-Person Perspective)
+                const cWidth = arcadeCanvas.width;
+                const cHeight = arcadeCanvas.height;
+                const halfH = cHeight / 2;
 
-                // Linoleum Floor Grid
-                arcadeCtx.strokeStyle = '#e0d890';
+                // Render Ceiling (School classroom acoustic ceiling tiles)
+                arcadeCtx.fillStyle = '#1a237e'; // Retro blue ceiling
+                arcadeCtx.fillRect(0, 0, cWidth, halfH);
+
+                // Render Floor with linoleum yellow perspective gradient
+                arcadeCtx.fillStyle = '#fff9c4'; // Linoleum yellow school floor
+                arcadeCtx.fillRect(0, halfH, cWidth, halfH);
+
+                // Floor tile lines
+                arcadeCtx.strokeStyle = '#fbc02d';
                 arcadeCtx.lineWidth = 1;
-                for (let x = 0; x < arcadeCanvas.width; x += 28) {
-                    arcadeCtx.beginPath();
-                    arcadeCtx.moveTo(x, 0);
-                    arcadeCtx.lineTo(x, arcadeCanvas.height);
-                    arcadeCtx.stroke();
-                }
-                for (let y = 0; y < arcadeCanvas.height; y += 28) {
+                for (let y = halfH; y < cHeight; y += 18) {
                     arcadeCtx.beginPath();
                     arcadeCtx.moveTo(0, y);
-                    arcadeCtx.lineTo(arcadeCanvas.width, y);
+                    arcadeCtx.lineTo(cWidth, y);
                     arcadeCtx.stroke();
                 }
 
-                // Draw School Walls (Thick Blue/Black schoolhouse blocks)
-                schoolWalls.forEach(w => {
-                    arcadeCtx.fillStyle = '#1565c0';
-                    arcadeCtx.fillRect(w.x, w.y, w.w, w.h);
-                    arcadeCtx.strokeStyle = '#000';
-                    arcadeCtx.lineWidth = 3;
-                    arcadeCtx.strokeRect(w.x, w.y, w.w, w.h);
-                });
+                const numRays = 140; // 140 vertical columns for crisp 90s pixel aesthetic
+                const colWidth = cWidth / numRays;
+                const zBuffer = new Array(numRays);
 
-                // Draw Classroom Desks and Notebooks
+                for (let r = 0; r < numRays; r++) {
+                    const rayAngle = (schoolPlayer.angle - schoolPlayer.fov / 2) + (r / numRays) * schoolPlayer.fov;
+                    const sin = Math.sin(rayAngle);
+                    const cos = Math.cos(rayAngle);
+
+                    let dist = 0;
+                    let hitWallType = 0;
+                    let sideHit = 0; // 0: X-wall, 1: Y-wall
+
+                    // DDA Raycasting Step
+                    const mapCheckX = Math.floor(schoolPlayer.x);
+                    const mapCheckY = Math.floor(schoolPlayer.y);
+                    const stepSize = 0.035;
+                    const maxDist = 18;
+
+                    let cx = schoolPlayer.x;
+                    let cy = schoolPlayer.y;
+
+                    while (dist < maxDist) {
+                        dist += stepSize;
+                        cx = schoolPlayer.x + cos * dist;
+                        cy = schoolPlayer.y + sin * dist;
+
+                        const cell = getMapCell(cx, cy);
+                        if (cell > 0) {
+                            hitWallType = cell;
+                            break;
+                        }
+                    }
+
+                    // Fish-eye correction
+                    const correctedDist = dist * Math.cos(rayAngle - schoolPlayer.angle);
+                    zBuffer[r] = correctedDist;
+
+                    const wallHeight = Math.min(cHeight * 1.6, (cHeight / Math.max(0.001, correctedDist)));
+                    const wallTop = Math.max(0, halfH - wallHeight / 2);
+
+                    // Colors by wall type:
+                    // 1: Iconic Baldi Blue Wall (#1565c0)
+                    // 2: Classroom Hallway Yellow Wall (#fbc02d)
+                    // 3: Wood Door (#8d6e63)
+                    let wallColor = '#1565c0';
+                    if (hitWallType === 2) wallColor = '#fbc02d';
+                    if (hitWallType === 3) wallColor = '#8d6e63';
+
+                    // Distance-based shading / fog effect
+                    const shade = Math.max(0.2, 1 - (correctedDist / maxDist));
+                    arcadeCtx.fillStyle = wallColor;
+                    arcadeCtx.fillRect(r * colWidth, wallTop, colWidth + 1, wallHeight);
+
+                    // Darken vertical column edges for retro 3D depth
+                    if (hitWallType === 3) {
+                        arcadeCtx.fillStyle = 'rgba(0,0,0,0.4)';
+                        arcadeCtx.fillRect(r * colWidth + 1, wallTop, 1, wallHeight);
+                    }
+                }
+
+                // 5. Render 3D Sprite Billboards (Notebooks & Baldi)
+                const sprites = [];
+
+                // Add active Notebooks to sprite list
                 schoolNotebooks.forEach(nb => {
                     if (!nb.collected) {
-                        // School desk
-                        arcadeCtx.fillStyle = '#8d6e63';
-                        arcadeCtx.fillRect(nb.x - 4, nb.y - 4, 28, 28);
-                        arcadeCtx.strokeStyle = '#000';
-                        arcadeCtx.lineWidth = 2;
-                        arcadeCtx.strokeRect(nb.x - 4, nb.y - 4, 28, 28);
-
-                        // Colorful notebook on top of desk
-                        arcadeCtx.fillStyle = nb.color;
-                        arcadeCtx.fillRect(nb.x + 2, nb.y + 2, 16, 20);
-                        arcadeCtx.strokeStyle = '#000';
-                        arcadeCtx.strokeRect(nb.x + 2, nb.y + 2, 16, 20);
-                        arcadeCtx.fillStyle = '#000';
-                        arcadeCtx.font = 'bold 9px sans-serif';
-                        arcadeCtx.fillText("📓", nb.x + 4, nb.y + 15);
+                        sprites.push({
+                            type: 'notebook',
+                            x: nb.x,
+                            y: nb.y,
+                            color: nb.color,
+                            id: nb.id
+                        });
                     }
                 });
 
-                // Draw Student Player (Blue shirt with pixel cap)
+                // Add Baldi to sprite list
+                sprites.push({
+                    type: 'baldi',
+                    x: schoolBaldi.x,
+                    y: schoolBaldi.y
+                });
+
+                // Sort sprites from furthest to closest (Painter's algorithm)
+                sprites.forEach(s => {
+                    s.dist = Math.hypot(schoolPlayer.x - s.x, schoolPlayer.y - s.y);
+                });
+                sprites.sort((a, b) => b.dist - a.dist);
+
+                // Render each sprite in 3D projection
+                sprites.forEach(s => {
+                    const sx = s.x - schoolPlayer.x;
+                    const sy = s.y - schoolPlayer.y;
+
+                    // Transform sprite with camera matrix
+                    let spriteAngle = Math.atan2(sy, sx) - schoolPlayer.angle;
+                    while (spriteAngle < -Math.PI) spriteAngle += Math.PI * 2;
+                    while (spriteAngle > Math.PI) spriteAngle -= Math.PI * 2;
+
+                    // Only render if sprite is in front of the camera
+                    if (spriteAngle > -schoolPlayer.fov && spriteAngle < schoolPlayer.fov && s.dist > 0.2) {
+                        const screenX = (cWidth / 2) + Math.tan(spriteAngle) * (cWidth / 2) / Math.tan(schoolPlayer.fov / 2);
+                        const spriteSize = Math.min(cHeight * 1.5, cHeight / s.dist);
+                        const spriteTop = halfH - spriteSize / 2;
+
+                        // Check Z-buffer occlusion (don't draw behind walls)
+                        const rayIndex = Math.floor((screenX / cWidth) * numRays);
+                        if (rayIndex >= 0 && rayIndex < numRays && s.dist < zBuffer[rayIndex] + 0.3) {
+                            if (s.type === 'notebook') {
+                                // Draw 3D Notebook Billboard
+                                arcadeCtx.fillStyle = s.color;
+                                arcadeCtx.fillRect(screenX - spriteSize * 0.25, spriteTop + spriteSize * 0.3, spriteSize * 0.5, spriteSize * 0.6);
+                                arcadeCtx.strokeStyle = '#000';
+                                arcadeCtx.lineWidth = Math.max(1, 3 / s.dist);
+                                arcadeCtx.strokeRect(screenX - spriteSize * 0.25, spriteTop + spriteSize * 0.3, spriteSize * 0.5, spriteSize * 0.6);
+
+                                arcadeCtx.fillStyle = '#000';
+                                arcadeCtx.font = `900 ${Math.max(10, Math.floor(spriteSize * 0.25))}px "Courier New"`;
+                                arcadeCtx.textAlign = 'center';
+                                arcadeCtx.fillText(`📓#${s.id}`, screenX, spriteTop + spriteSize * 0.65);
+                            } else if (s.type === 'baldi') {
+                                // Draw 3D Baldi Billboard (Iconic Green Sweater, Head & Ruler)
+                                const bW = spriteSize * 0.55;
+                                const bH = spriteSize * 0.95;
+                                const bLeft = screenX - bW / 2;
+                                const bTop = halfH - bH / 2;
+
+                                // Baldi Body (Green sweater)
+                                arcadeCtx.fillStyle = '#00c853';
+                                arcadeCtx.fillRect(bLeft + bW * 0.15, bTop + bH * 0.35, bW * 0.7, bH * 0.45);
+                                arcadeCtx.strokeStyle = '#000';
+                                arcadeCtx.lineWidth = Math.max(2, 4 / s.dist);
+                                arcadeCtx.strokeRect(bLeft + bW * 0.15, bTop + bH * 0.35, bW * 0.7, bH * 0.45);
+
+                                // Baldi Head (Bald with smile)
+                                arcadeCtx.fillStyle = '#ffe0bd';
+                                arcadeCtx.beginPath();
+                                arcadeCtx.arc(screenX, bTop + bH * 0.22, bW * 0.22, 0, Math.PI * 2);
+                                arcadeCtx.fill();
+                                arcadeCtx.stroke();
+
+                                // Baldi Ruler in hand
+                                arcadeCtx.fillStyle = '#8d6e63';
+                                arcadeCtx.fillRect(bLeft + bW * 0.82, bTop + bH * 0.2, bW * 0.14, bH * 0.55);
+                                arcadeCtx.strokeRect(bLeft + bW * 0.82, bTop + bH * 0.2, bW * 0.14, bH * 0.55);
+
+                                // Ruler slap indicator text when close
+                                if (s.dist < 3.5) {
+                                    arcadeCtx.fillStyle = '#ff1744';
+                                    arcadeCtx.font = '900 16px "Courier New"';
+                                    arcadeCtx.textAlign = 'center';
+                                    arcadeCtx.fillText("📏 SLAP! SLAP! 📏", screenX, bTop - 8);
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // 6. Mini Radar in Top-Right Corner
+                const radarSize = 70;
+                const radarX = cWidth - radarSize - 8;
+                const radarY = 8;
+                arcadeCtx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+                arcadeCtx.fillRect(radarX, radarY, radarSize, radarSize);
+                arcadeCtx.strokeStyle = '#76ff03';
+                arcadeCtx.lineWidth = 2;
+                arcadeCtx.strokeRect(radarX, radarY, radarSize, radarSize);
+
+                const scaleX = radarSize / MAP_W;
+                const scaleY = radarSize / MAP_H;
+
+                // Player dot (Blue) with direction pointer
                 arcadeCtx.fillStyle = '#00e5ff';
-                arcadeCtx.fillRect(schoolPlayer.x, schoolPlayer.y, schoolPlayer.size, schoolPlayer.size);
-                arcadeCtx.strokeStyle = '#000';
-                arcadeCtx.lineWidth = 3;
-                arcadeCtx.strokeRect(schoolPlayer.x, schoolPlayer.y, schoolPlayer.size, schoolPlayer.size);
-                arcadeCtx.fillStyle = '#ffe082';
-                arcadeCtx.fillRect(schoolPlayer.x + 4, schoolPlayer.y + 4, 12, 12);
-                arcadeCtx.fillStyle = '#000';
-                arcadeCtx.font = '10px sans-serif';
-                arcadeCtx.fillText("👦", schoolPlayer.x + 2, schoolPlayer.y + 15);
-
-                // Draw Baldi (Green sweater, bald head & brown wooden ruler)
-                arcadeCtx.fillStyle = '#00c853'; // Iconic green sweater
-                arcadeCtx.fillRect(schoolBaldi.x, schoolBaldi.y, schoolBaldi.size, schoolBaldi.size);
-                arcadeCtx.strokeStyle = '#000';
-                arcadeCtx.lineWidth = 3;
-                arcadeCtx.strokeRect(schoolBaldi.x, schoolBaldi.y, schoolBaldi.size, schoolBaldi.size);
-
-                // Baldi's Head
-                arcadeCtx.fillStyle = '#ffe0bd';
+                arcadeCtx.fillRect(radarX + schoolPlayer.x * scaleX - 2, radarY + schoolPlayer.y * scaleY - 2, 5, 5);
+                arcadeCtx.strokeStyle = '#00e5ff';
                 arcadeCtx.beginPath();
-                arcadeCtx.arc(schoolBaldi.x + schoolBaldi.size / 2, schoolBaldi.y + 7, 7, 0, Math.PI * 2);
-                arcadeCtx.fill();
+                arcadeCtx.moveTo(radarX + schoolPlayer.x * scaleX, radarY + schoolPlayer.y * scaleY);
+                arcadeCtx.lineTo(radarX + (schoolPlayer.x + Math.cos(schoolPlayer.angle) * 1.5) * scaleX, radarY + (schoolPlayer.y + Math.sin(schoolPlayer.angle) * 1.5) * scaleY);
                 arcadeCtx.stroke();
 
-                // Brown wooden ruler in Baldi's hand
-                arcadeCtx.fillStyle = '#8d6e63';
-                arcadeCtx.fillRect(schoolBaldi.x + schoolBaldi.size - 2, schoolBaldi.y - 6, 5, 22);
-                arcadeCtx.strokeRect(schoolBaldi.x + schoolBaldi.size - 2, schoolBaldi.y - 6, 5, 22);
+                // Baldi dot (Red)
+                arcadeCtx.fillStyle = '#ff1744';
+                arcadeCtx.fillRect(radarX + schoolBaldi.x * scaleX - 2, radarY + schoolBaldi.y * scaleY - 2, 5, 5);
 
                 schoolAnimFrame = requestAnimationFrame(schoolhouseLoop);
             }
