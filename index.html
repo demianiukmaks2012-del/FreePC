@@ -2623,6 +2623,7 @@
             // Keypad interaction
             tpKeypadBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
+                    playRetroSound('beep');
                     const k = btn.dataset.key;
                     if (k === '-' && currentQuizEntered.length === 0) {
                         currentQuizEntered = '-';
@@ -2636,6 +2637,7 @@
             });
 
             tpKeyClear.addEventListener('click', () => {
+                playRetroSound('beep');
                 currentQuizEntered = "";
                 updateQuizDisplay();
             });
@@ -3100,6 +3102,78 @@
             /* =========================================================
                12.5 BALDI ARCADE ROOM MINI-GAME ENGINE (DUAL MODES)
                ========================================================= */
+            // Retro Web Audio Synthesizer for Authentic Baldi Sounds
+            let audioCtx = null;
+            function initAudio() {
+                if (!audioCtx) {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContextClass) audioCtx = new AudioContextClass();
+                }
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }
+
+            function playRetroSound(type) {
+                try {
+                    initAudio();
+                    if (!audioCtx) return;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    const now = audioCtx.currentTime;
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    if (type === 'beep') {
+                        // Standard Think Pad button click beep
+                        osc.type = 'square';
+                        osc.frequency.setValueAtTime(880, now);
+                        gain.gain.setValueAtTime(0.12, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                        osc.start(now);
+                        osc.stop(now + 0.08);
+                    } else if (type === 'notebook') {
+                        // Picking up notebook jingle
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(523.25, now); // C5
+                        osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                        osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                        gain.gain.setValueAtTime(0.18, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                        osc.start(now);
+                        osc.stop(now + 0.3);
+                    } else if (type === 'slap') {
+                        // Baldi ruler slap sound
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(140, now);
+                        osc.frequency.exponentialRampToValueAtTime(35, now + 0.18);
+                        gain.gain.setValueAtTime(0.3, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+                        osc.start(now);
+                        osc.stop(now + 0.18);
+                    } else if (type === 'correct') {
+                        // Think Pad correct answer
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(440, now);
+                        osc.frequency.setValueAtTime(880, now + 0.1);
+                        gain.gain.setValueAtTime(0.2, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                        osc.start(now);
+                        osc.stop(now + 0.35);
+                    } else if (type === 'wrong') {
+                        // Think Pad wrong answer / Baldi anger buzzer
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(120, now);
+                        osc.frequency.setValueAtTime(90, now + 0.12);
+                        gain.gain.setValueAtTime(0.25, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                        osc.start(now);
+                        osc.stop(now + 0.3);
+                    }
+                } catch (e) {
+                    // Audio context may be restricted by autoplay policy
+                }
+            }
             const arcadeCanvas = document.getElementById('arcadeCanvas');
             const arcadeCtx = arcadeCanvas ? arcadeCanvas.getContext('2d') : null;
             const arcadeScoreEl = document.getElementById('arcadeScore');
@@ -3410,7 +3484,7 @@
             function schoolhouseLoop() {
                 if (!schoolRunning || !arcadeCtx) return;
 
-                // Move Schoolhouse Player
+                // Move Schoolhouse Player with smooth axis-independent sliding
                 let dx = 0;
                 let dy = 0;
                 if (schoolKeys.left) dx -= schoolPlayer.speed;
@@ -3418,22 +3492,39 @@
                 if (schoolKeys.up) dy -= schoolPlayer.speed;
                 if (schoolKeys.down) dy += schoolPlayer.speed;
 
+                // Normalize diagonal speed so diagonal movement is not 1.414x faster
+                if (dx !== 0 && dy !== 0) {
+                    dx *= 0.7071;
+                    dy *= 0.7071;
+                }
+
+                // Check X-axis movement
                 if (dx !== 0 && !checkWallCollision(schoolPlayer.x + dx, schoolPlayer.y, schoolPlayer.size)) {
                     schoolPlayer.x += dx;
                 }
+                // Check Y-axis movement independently (smooth corner sliding)
                 if (dy !== 0 && !checkWallCollision(schoolPlayer.x, schoolPlayer.y + dy, schoolPlayer.size)) {
                     schoolPlayer.y += dy;
                 }
 
-                // AI: Baldi pursues the student through the school halls
+                // AI: Baldi pursues the student with authentic slap cadence
+                baldiSchoolRulerTimer++;
+                // Step interval decreases as Baldi's anger and speed increase
+                const slapInterval = Math.max(14, Math.floor(48 - (schoolBaldi.speed * 8)));
+                if (baldiSchoolRulerTimer % slapInterval === 0) {
+                    playRetroSound('slap');
+                }
+
+                // Path tracking towards player with obstacle avoidance
                 const angle = Math.atan2(schoolPlayer.y - schoolBaldi.y, schoolPlayer.x - schoolBaldi.x);
                 let baldiDx = Math.cos(angle) * schoolBaldi.speed;
                 let baldiDy = Math.sin(angle) * schoolBaldi.speed;
 
-                // Simple wall sliding for Baldi
+                // Wall navigation for Baldi
                 if (!checkWallCollision(schoolBaldi.x + baldiDx, schoolBaldi.y, schoolBaldi.size)) {
                     schoolBaldi.x += baldiDx;
-                } else if (!checkWallCollision(schoolBaldi.x, schoolBaldi.y + baldiDy, schoolBaldi.size)) {
+                }
+                if (!checkWallCollision(schoolBaldi.x, schoolBaldi.y + baldiDy, schoolBaldi.size)) {
                     schoolBaldi.y += baldiDy;
                 }
 
@@ -3441,35 +3532,38 @@
                 schoolNotebooks.forEach(nb => {
                     if (!nb.collected) {
                         const dist = Math.hypot((schoolPlayer.x + schoolPlayer.size / 2) - (nb.x + 10), (schoolPlayer.y + schoolPlayer.size / 2) - (nb.y + 10));
-                        if (dist < 20) {
+                        if (dist < 22) {
                             nb.collected = true;
                             notebooksCollected++;
                             baldiAngerLevel++;
-                            schoolBaldi.speed += 0.55; // Baldi gets faster!
+                            schoolBaldi.speed += 0.5; // Baldi steps faster
                             updateSchoolHeader();
+                            playRetroSound('notebook');
 
-                            // Trigger You Can Think Pad in-game!
+                            // Trigger authentic You Can Think Pad modal in-game!
                             schoolRunning = false;
                             generateMathQuiz();
                             mathQuizModal.classList.remove('hidden');
                             triggerBaldiEmotion('talking');
                             updateBaldiSpeech(`Ти знайшов зошит #${notebooksCollected}! Розв'яжи задачу на Think Pad!`);
 
-                            // Resume school game when quiz solved
-                            const prevFinalize = finalizeBooking;
-                            // Temporarily hook quiz submission to resume schoolhouse
+                            // Hook quiz submission to resume schoolhouse
                             submitQuizBtn.onclick = () => {
                                 const val = parseInt(currentQuizEntered, 10);
                                 if (val === currentQuizAnswer) {
+                                    playRetroSound('correct');
                                     mathQuizModal.classList.add('hidden');
                                     triggerBaldiEmotion('celebrate');
                                     updateBaldiSpeech("Правильно! Зошит зараховано! Швидше шукай наступний, Балді наближається!");
                                     schoolRunning = true;
                                     schoolhouseLoop();
                                 } else {
+                                    playRetroSound('wrong');
                                     quizFeedback.textContent = "WRONG! BALDI IS GETTING FASTER! 📏";
                                     quizFeedback.style.color = "#d32f2f";
-                                    schoolBaldi.speed += 0.8;
+                                    schoolBaldi.speed += 0.85; // Faster slap frequency on mistakes!
+                                    baldiAngerLevel = Math.min(5, baldiAngerLevel + 1);
+                                    updateSchoolHeader();
                                     triggerBaldiEmotion('angry');
                                 }
                             };
@@ -3576,6 +3670,7 @@
             }
 
             function caughtByBaldi() {
+                playRetroSound('slap');
                 schoolRunning = false;
                 if (schoolAnimFrame) cancelAnimationFrame(schoolAnimFrame);
                 arcadeCtx.fillStyle = 'rgba(211, 47, 47, 0.9)';
@@ -3600,6 +3695,7 @@
             }
 
             function winSchoolhouseGame() {
+                playRetroSound('correct');
                 arcadeCtx.fillStyle = 'rgba(46, 125, 50, 0.95)';
                 arcadeCtx.fillRect(0, 0, arcadeCanvas.width, arcadeCanvas.height);
 
