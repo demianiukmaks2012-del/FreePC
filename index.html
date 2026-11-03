@@ -638,6 +638,54 @@
             box-shadow: inset 2px 2px 0 #000;
         }
 
+        /* Arcade Overlay Splash Button for Baldi Schoolhouse */
+        .arcade-splash-overlay {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            width: 100%;
+            height: 340px;
+            background: rgba(21, 101, 192, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            box-sizing: border-box;
+            padding: 20px;
+        }
+
+        .arcade-splash-overlay.hidden {
+            display: none !important;
+        }
+
+        .real-start-btn {
+            background: #76ff03;
+            color: #000;
+            font-family: 'Courier New', monospace;
+            font-size: 22px;
+            font-weight: 900;
+            padding: 14px 28px;
+            border: 5px solid #000;
+            box-shadow: 6px 6px 0 #000;
+            cursor: pointer;
+            text-transform: uppercase;
+            animation: startBtnPulse 1.2s infinite alternate;
+        }
+        .real-start-btn:hover {
+            background: #ffea00;
+            transform: scale(1.05);
+        }
+        .real-start-btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        @keyframes startBtnPulse {
+            0% { transform: scale(1); box-shadow: 6px 6px 0 #000; }
+            100% { transform: scale(1.06); box-shadow: 8px 8px 0 #ffea00; }
+        }
+
         /* Detailed 2D PC Station (Stage 3.2) */
         .pc-station {
             background: #c8e6c9;
@@ -1442,6 +1490,22 @@
                         <span id="arcadeStatLabel1">РАХУНОК: <span id="arcadeScore">0</span></span>
                         <span id="arcadeStatLabel2">РЕКОРД: <span id="arcadeHighScore">0</span></span>
                         <span id="arcadeStatLabel3">ЖИТТЯ: <span id="arcadeLives">❤️❤️❤️</span></span>
+                    </div>
+
+                    <!-- Overlay Start Screen for Baldi Schoolhouse Mode -->
+                    <div id="schoolhouseSplashOverlay" class="arcade-splash-overlay hidden">
+                        <div style="font-family: 'Courier New', monospace; font-size: 26px; font-weight: 900; color: #ffff00; margin-bottom: 8px; text-shadow: 3px 3px 0 #000;">
+                            🏫 BALDI'S SCHOOLHOUSE
+                        </div>
+                        <div style="font-family: 'Comic Sans MS', sans-serif; font-size: 15px; font-weight: bold; color: #ffffff; margin-bottom: 20px; max-width: 440px; text-align: center;">
+                            Знайди 5 кольорових зошитів у класах, розв'яжи математичні приклади на Think Pad та тікай від Балді з лінійкою!
+                        </div>
+                        <button type="button" class="real-start-btn" id="realStartBtn">
+                            ▶ START GAME / ПОЧАТИ ГРУ
+                        </button>
+                        <div style="font-size: 12px; color: #76ff03; font-weight: bold; margin-top: 15px; font-family: 'Courier New', monospace;">
+                            [Керування: Клавіші W, A, S, D або Стрілки на клавіатурі / D-Pad знизу]
+                        </div>
                     </div>
 
                     <canvas id="arcadeCanvas" width="560" height="340"></canvas>
@@ -3052,8 +3116,10 @@
             const arcadeSchoolControls = document.getElementById('arcadeSchoolControls');
 
             const arcadeStartBtn = document.getElementById('arcadeStartBtn');
+            const realStartBtn = document.getElementById('realStartBtn');
             const startBaldiGameBtn = document.getElementById('startBaldiGameBtn');
             const arcadeSchoolStartBtn = startBaldiGameBtn; // Alias for backward compatibility
+            const schoolhouseSplashOverlay = document.getElementById('schoolhouseSplashOverlay');
             const arcadeLeftBtn = document.getElementById('arcadeLeftBtn');
             const arcadeRightBtn = document.getElementById('arcadeRightBtn');
 
@@ -3124,6 +3190,7 @@
                 schoolRunning = false;
 
                 if (mode === 'catcher') {
+                    if (schoolhouseSplashOverlay) schoolhouseSplashOverlay.classList.add('hidden');
                     tabModeCatcher.classList.add('active');
                     tabModeSchoolhouse.classList.remove('active');
                     arcadeRulesHint.innerHTML = "🎯 <strong>Режим «Ловець зошитів»:</strong> Керуй портфелем (← та →). Лови зошити (+10), збирай лінійки (+25) та уникай гнівного Балді!";
@@ -3303,6 +3370,7 @@
 
             /* ---------- Mode 2 Engine (Classic Baldi Schoolhouse) ---------- */
             function startSchoolhouseGame() {
+                if (schoolhouseSplashOverlay) schoolhouseSplashOverlay.classList.add('hidden');
                 schoolRunning = true;
                 notebooksCollected = 0;
                 baldiAngerLevel = 1;
@@ -3322,7 +3390,8 @@
                 schoolhouseLoop();
             }
 
-            if (arcadeSchoolStartBtn) arcadeSchoolStartBtn.addEventListener('click', startSchoolhouseGame);
+            if (realStartBtn) realStartBtn.addEventListener('click', startSchoolhouseGame);
+            if (startBaldiGameBtn) startBaldiGameBtn.addEventListener('click', startSchoolhouseGame);
 
             function checkWallCollision(newX, newY, size) {
                 for (let wall of schoolWalls) {
@@ -3554,6 +3623,7 @@
 
             function initSchoolhouseScreen() {
                 if (!arcadeCanvas || !arcadeCtx) return;
+                if (schoolhouseSplashOverlay) schoolhouseSplashOverlay.classList.remove('hidden');
                 arcadeCtx.fillStyle = '#1565c0';
                 arcadeCtx.fillRect(0, 0, arcadeCanvas.width, arcadeCanvas.height);
                 arcadeCtx.fillStyle = '#ffff00';
@@ -3565,7 +3635,7 @@
                 arcadeCtx.fillText("Знайди 5 кольорових зошитів та тікай від Балді!", arcadeCanvas.width / 2, 170);
                 arcadeCtx.fillStyle = '#76ff03';
                 arcadeCtx.font = 'bold 15px "Courier New"';
-                arcadeCtx.fillText("Натисніть кнопку «START GAME» нижче для старту!", arcadeCanvas.width / 2, 210);
+                arcadeCtx.fillText("Натисніть кнопку «START GAME» для старту!", arcadeCanvas.width / 2, 210);
                 arcadeCtx.textAlign = 'left';
             }
 
