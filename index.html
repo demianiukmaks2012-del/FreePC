@@ -1456,21 +1456,21 @@
                     </div>
 
                     <!-- D-Pad Controls for Schoolhouse Mode -->
-                    <div class="arcade-controls-panel hidden" id="arcadeSchoolControls" style="display: none; justify-content: space-between; align-items: center; padding: 8px 16px;">
+                    <div class="arcade-controls-panel hidden" id="arcadeSchoolControls" style="display: none; justify-content: space-between; align-items: center; padding: 10px 16px; flex-wrap: wrap; gap: 10px;">
                         <div class="arcade-dpad-grid">
                             <div></div>
-                            <button type="button" class="dpad-btn" id="dpadUp">▲</button>
+                            <button type="button" class="dpad-btn" id="dpadUp" aria-label="Вгору">▲</button>
                             <div></div>
-                            <button type="button" class="dpad-btn" id="dpadLeft">◀</button>
-                            <button type="button" class="dpad-btn" id="dpadDown">▼</button>
-                            <button type="button" class="dpad-btn" id="dpadRight">▶</button>
+                            <button type="button" class="dpad-btn" id="dpadLeft" aria-label="Вліво">◀</button>
+                            <button type="button" class="dpad-btn" id="dpadDown" aria-label="Вниз">▼</button>
+                            <button type="button" class="dpad-btn" id="dpadRight" aria-label="Вправо">▶</button>
                         </div>
-                        <div style="text-align: right;">
-                            <button type="button" class="retro-btn" id="arcadeSchoolStartBtn" style="background: #76ff03; color: #000; font-size: 15px; padding: 8px 14px;">
-                                НОВА ШКОЛА
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+                            <button type="button" class="retro-btn" id="startBaldiGameBtn" style="background: #76ff03; color: #000; font-size: 16px; font-weight: 900; padding: 10px 20px; border: 4px solid #000; box-shadow: 4px 4px 0 #000;">
+                                START GAME / НОВА ШКОЛА
                             </button>
-                            <div style="font-size: 11px; color: #fff; margin-top: 4px; font-weight: bold;">
-                                Керування: WASD або Стрілки
+                            <div style="font-size: 12px; color: #fff; font-weight: bold; background: #000; padding: 2px 6px;">
+                                Керування: WASD / Стрілки / D-Pad
                             </div>
                         </div>
                     </div>
@@ -3052,7 +3052,8 @@
             const arcadeSchoolControls = document.getElementById('arcadeSchoolControls');
 
             const arcadeStartBtn = document.getElementById('arcadeStartBtn');
-            const arcadeSchoolStartBtn = document.getElementById('arcadeSchoolStartBtn');
+            const startBaldiGameBtn = document.getElementById('startBaldiGameBtn');
+            const arcadeSchoolStartBtn = startBaldiGameBtn; // Alias for backward compatibility
             const arcadeLeftBtn = document.getElementById('arcadeLeftBtn');
             const arcadeRightBtn = document.getElementById('arcadeRightBtn');
 
@@ -3313,7 +3314,7 @@
 
                 schoolNotebooks.forEach(nb => nb.collected = false);
 
-                if (arcadeSchoolStartBtn) arcadeSchoolStartBtn.textContent = 'ПЕРЕЗАПУСК';
+                if (startBaldiGameBtn) startBaldiGameBtn.textContent = 'ПЕРЕЗАПУСК ШКОЛИ';
                 updateSchoolHeader();
                 triggerBaldiEmotion('talking');
                 updateBaldiSpeech("Знайди всі 5 зошитів у класах та розв'яжи математичні задачі! Тікай від мене!");
@@ -3564,7 +3565,7 @@
                 arcadeCtx.fillText("Знайди 5 кольорових зошитів та тікай від Балді!", arcadeCanvas.width / 2, 170);
                 arcadeCtx.fillStyle = '#76ff03';
                 arcadeCtx.font = 'bold 15px "Courier New"';
-                arcadeCtx.fillText("Натисніть «НОВА ШКОЛА» для старту!", arcadeCanvas.width / 2, 210);
+                arcadeCtx.fillText("Натисніть кнопку «START GAME» нижче для старту!", arcadeCanvas.width / 2, 210);
                 arcadeCtx.textAlign = 'left';
             }
 
