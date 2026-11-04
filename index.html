@@ -548,6 +548,7 @@
             margin: 0 auto;
             text-align: center;
             overflow: hidden;
+            transition: all 0.2s ease;
         }
 
         #arcadeCanvas {
@@ -1364,12 +1365,16 @@
 
             <!-- ================= SECTIONS ================= -->
 
-            <!-- 1. PROFILE VIEW -->
+            <!-- 1. PROFILE VIEW & SECURE AUTHENTICATION -->
             <section id="profileView" class="view-section card-box">
                 <h2 class="section-title">
-                    <span>Профіль учня</span>
-                    <span>✏️</span>
+                    <span>Авторизація учня та розклад занять</span>
+                    <span>🔐</span>
                 </h2>
+                <div style="background: #e3f2fd; border: 3px solid #000; padding: 12px; margin-bottom: 18px; font-weight: bold; font-size: 13px;">
+                    🛡️ <strong>Суворий захист школи:</strong> Бронювання закріплюється виключно за учнем із 30 офіційно зарахованих у журналі класу. Введіть персональний 4-значний PIN-код учня (код доступу: <strong>2384</strong>) для захисту від бронювання під чужим ім'ям!
+                </div>
+
                 <div class="form-group">
                     <label class="form-label">Група / Клас:</label>
                     <select id="groupInput" class="form-select">
@@ -1384,18 +1389,27 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Ім'я та Прізвище (згідно зі списком журналу):</label>
+                    <label class="form-label">Ім'я та Прізвище (згідно зі списком журналу 30 учнів):</label>
                     <input type="text" id="nameInput" class="form-input" list="studentNamesList" placeholder="Введіть ваше повне ім'я та прізвище...">
                     <datalist id="studentNamesList"></datalist>
                     <div id="classRosterHint" style="font-size: 11px; font-weight: bold; margin-top: 5px; color: #444;">
                         * Доступ дозволено лише для 30 офіційно зарахованих учнів обраного класу.
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-label">Персональний PIN-код учня (4 цифри):</label>
+                    <input type="password" id="studentPinInput" maxlength="4" class="form-input" placeholder="Введіть код 2384..." style="letter-spacing: 4px; font-family: monospace; font-size: 18px; max-width: 280px;">
+                    <div style="font-size: 11px; font-weight: bold; margin-top: 5px; color: #555;">
+                        * Код доступу: <code>2384</code>. Безпека запобігає несанкціонованим бронюванням.
+                    </div>
+                </div>
+
                 <div style="display: flex; align-items: center; gap: 15px; margin-top: 20px;">
                     <button type="button" id="saveProfileBtn" class="retro-btn btn-profile" style="background-color: #ec407a; color: #fff;">
-                        Зберегти профіль
+                        Авторизуватись та зберегти
                     </button>
-                    <span id="savedTag" class="hidden" style="color: #2e7d32; font-weight: 900;">✓ Збережено успішно!</span>
+                    <span id="savedTag" class="hidden" style="color: #2e7d32; font-weight: 900;">✓ Авторизовано успішно!</span>
                 </div>
             </section>
 
@@ -1515,7 +1529,7 @@
                 </div>
 
                 <!-- Game Mode Selector Buttons -->
-                <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center;">
                     <button type="button" class="arcade-mode-tab active" id="tabModeCatcher">
                         1. Ловець Зошитів (Catcher)
                     </button>
@@ -1540,15 +1554,9 @@
                         <div style="font-family: 'Courier New', monospace; font-size: 26px; font-weight: 900; color: #ffff00; margin-bottom: 8px; text-shadow: 3px 3px 0 #000;">
                             🏫 BALDI'S SCHOOLHOUSE
                         </div>
-                        <div style="font-family: 'Comic Sans MS', sans-serif; font-size: 15px; font-weight: bold; color: #ffffff; margin-bottom: 20px; max-width: 440px; text-align: center;">
-                            Знайди 5 кольорових зошитів у класах, розв'яжи математичні приклади на Think Pad та тікай від Балді з лінійкою!
-                        </div>
-                        <button type="button" class="real-start-btn" id="realStartBtn">
-                            ▶ START GAME / ПОЧАТИ ГРУ
+                        <button type="button" class="real-start-btn" id="realStartBtn" style="margin-top: 15px;">
+                            ▶ START GAME
                         </button>
-                        <div style="font-size: 12px; color: #76ff03; font-weight: bold; margin-top: 15px; font-family: 'Courier New', monospace;">
-                            [Керування 3D: W/▲ Вперед, S/▼ Назад, A/◄ Поворот вліво, D/► Поворот вправо]
-                        </div>
                     </div>
 
                     <!-- Overlay Game Over Screen with Clickable Restart Button -->
@@ -1565,9 +1573,12 @@
                         <button type="button" class="restart-baldi-btn" id="baldiRestartBtn">
                             ▶ RESTART GAME / СПРОБУВАТИ ЗНОВУ
                         </button>
+                        <button type="button" class="restart-baldi-btn" id="restartBaldiBtn" style="display: none;">
+                            ▶ RESTART
+                        </button>
                     </div>
 
-                    <div style="position: relative; display: inline-block;">
+                    <div class="arcade-canvas-wrapper" style="position: relative; display: inline-block;">
                         <canvas id="arcadeCanvas" width="560" height="340" tabindex="0" style="cursor: crosshair;"></canvas>
                         <!-- 3D Crosshair & Mouse Look Indicator -->
                         <div id="arcade3dCrosshair" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; color: #76ff03; font-size: 24px; font-weight: 900; text-shadow: 1px 1px 0 #000; line-height: 1;">
@@ -1720,9 +1731,9 @@
                     </div>
 
                     <div id="adminStep2Box" class="hidden">
-                        <h3 style="font-weight: 900; margin-bottom: 12px; color: #d32f2f;">Етап 2: Введіть код безпеки школи</h3>
+                        <h3 style="font-weight: 900; margin-bottom: 12px; color: #d32f2f;">Етап 2: Введіть секретний код безпеки (2384)</h3>
                         <div style="display: flex; justify-content: center; gap: 10px; max-width: 380px; margin: 0 auto;">
-                            <input type="password" id="adminSecurityCodeInput" class="form-input" placeholder="Введіть секретний код...">
+                            <input type="password" id="adminSecurityCodeInput" class="form-input" placeholder="Введіть код 2384..." maxlength="4" style="letter-spacing: 3px; font-family: monospace; font-size: 18px;">
                             <button type="button" id="adminLoginBtn" class="retro-btn btn-admin" style="background-color: #2e7d32; color: #fff;">Підтвердити</button>
                         </div>
                         <button type="button" id="adminBackToStep1Btn" style="background: none; border: none; text-decoration: underline; cursor: pointer; font-size: 13px; font-weight: bold; margin-top: 10px;">
@@ -1843,17 +1854,21 @@
                 </div>
             </div>
 
-            <!-- Booking Slot Options (Stage 5.1) -->
+            <!-- Booking Slot Options (Stage 5.1 & Period Sync) -->
             <div id="bookingActionBox" style="background: #fffde7; border: 3px solid #000; padding: 15px; margin-top: 15px;">
                 <div class="form-group">
-                    <label class="form-label">Оберіть тривалість сеансу:</label>
+                    <label class="form-label">Оберіть розклад уроку / навчальну пару (Class Period Sync):</label>
                     <select id="sessionDurationSelect" class="form-select">
-                        <option value="45">Експрес-робота (45 хвилин)</option>
-                        <option value="90">1 Пара: 08:30 - 10:05 (90 хвилин)</option>
-                        <option value="95">2 Пара: 10:20 - 11:55 (95 хвилин)</option>
-                        <option value="90">3 Пара: 12:10 - 13:45 (90 хвилин)</option>
-                        <option value="20">Короткий тест (20 секунд для перевірки авто-скидання)</option>
+                        <option value="slot_1">1 Пара: 08:30 - 10:05 (Офіційний розклад уроків)</option>
+                        <option value="slot_2">2 Пара: 10:20 - 11:55 (Офіційний розклад уроків)</option>
+                        <option value="slot_3">3 Пара: 12:10 - 13:45 (Офіційний розклад уроків)</option>
+                        <option value="slot_4">4 Пара: 14:00 - 15:35 (Офіційний розклад уроків)</option>
+                        <option value="quick_45">Експрес-практикум (45 хвилин від зараз)</option>
+                        <option value="test_20">Швидка перевірка (20 секунд для перевірки авто-звільнення)</option>
                     </select>
+                </div>
+                <div id="scheduleSyncStatus" style="font-size: 12px; font-weight: bold; color: #1b5e20; background: #e8f5e9; border: 2px solid #2e7d32; padding: 6px 10px; margin-bottom: 12px;">
+                    🕒 <strong>Синхронізація:</strong> Таймер зворотного відліку автоматично активується відповідно до навчального періоду.
                 </div>
 
                 <button type="button" id="confirmBookingBtn" class="retro-btn" style="background: #2e7d32; color: #fff; width: 100%; text-align: center; justify-content: center; font-size: 18px;">
@@ -1877,8 +1892,10 @@
             <!-- Header -->
             <div class="thinkpad-top-bar">
                 <div class="thinkpad-title">YOU CAN THINK PAD™</div>
-                <div style="background: #111; color: #76ff03; font-family: 'Courier New', monospace; font-size: 11px; padding: 2px 6px; border: 2px solid #000; font-weight: 900;">
-                    MATH-OS v1.0
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <div style="background: #111; color: #76ff03; font-family: 'Courier New', monospace; font-size: 11px; padding: 2px 6px; border: 2px solid #000; font-weight: 900;">
+                        MATH-OS v1.0
+                    </div>
                 </div>
             </div>
 
@@ -2073,7 +2090,7 @@
 
             // Global State
             let state = {
-                profile: safeGetJSON('freePC_profile', { name: '', group: '' }),
+                profile: safeGetJSON('freePC_profile', { name: '', group: '', pin: '2384' }),
                 booking: safeGetJSON('freePC_booking', null),
                 classrooms: safeGetJSON('freePC_classrooms', DEFAULT_CLASSROOMS),
                 occupiedPcs: safeGetJSON('freePC_occupiedPcs', {
@@ -2108,6 +2125,7 @@
             const cancelBookingBtn = document.getElementById('cancelBookingBtn');
             const nameInput = document.getElementById('nameInput');
             const groupInput = document.getElementById('groupInput');
+            const studentPinInput = document.getElementById('studentPinInput');
             const saveProfileBtn = document.getElementById('saveProfileBtn');
             const savedTag = document.getElementById('savedTag');
             const cabinetSelect = document.getElementById('cabinetSelect');
@@ -2203,6 +2221,7 @@
 
             // Populate form if profile data exists
             if (state.profile.name) nameInput.value = state.profile.name;
+            if (state.profile.pin && studentPinInput) studentPinInput.value = state.profile.pin;
             if (state.profile.group) {
                 groupInput.value = state.profile.group;
                 populateStudentDatalist(state.profile.group);
@@ -2418,12 +2437,21 @@
                 e.preventDefault();
                 const rawName = nameInput.value.trim();
                 const selectedClass = groupInput.value.trim();
+                const pin = studentPinInput ? studentPinInput.value.trim() : '2384';
 
                 if (!selectedClass) {
                     triggerBaldiEmotion('angry');
                     updateBaldiSpeech("Спочатку обери свій клас зі списку!");
                     alert("⚠️ Будь ласка, оберіть ваш клас / групу!");
                     groupInput.focus();
+                    return;
+                }
+
+                if (!pin || pin !== '2384') {
+                    triggerBaldiEmotion('angry');
+                    updateBaldiSpeech("Невірний код доступу учня! Код безпеки: 2384! 📏");
+                    alert("⚠️ Помилка доступу: Введіть секретний код безпеки: 2384!");
+                    if (studentPinInput) studentPinInput.focus();
                     return;
                 }
 
@@ -2450,7 +2478,7 @@
                     return;
                 }
 
-                state.profile = { name: matchedStudent, group: selectedClass };
+                state.profile = { name: matchedStudent, group: selectedClass, pin: pin };
                 nameInput.value = matchedStudent;
                 safeSetJSON('freePC_profile', state.profile);
 
@@ -2458,7 +2486,7 @@
                 setTimeout(() => savedTag.classList.add('hidden'), 2500);
 
                 triggerBaldiEmotion('celebrate');
-                updateBaldiSpeech(`Чудово, ${state.profile.name}! Особу підтверджено в журналі ${state.profile.group}. Обирай кабінет!`);
+                updateBaldiSpeech(`Чудово, ${state.profile.name}! Особу підтверджено за PIN-кодом у журналі ${state.profile.group}. Обирай кабінет!`);
                 setTimeout(() => switchView('cabinet'), 700);
             });
 
@@ -2780,17 +2808,67 @@
             cancelQuizBtn.addEventListener('click', () => {
                 mathQuizModal.classList.add('hidden');
                 pendingBookingData = null;
-                updateBaldiSpeech("Бронювання скасовано, бо ти злякався You Can Think Pad!");
+
+                // Fix Math Pad Freeze: if cancelled during 3D Schoolhouse game, resume safely!
+                if (currentGameMode === 'schoolhouse') {
+                    schoolRunning = true;
+                    isGameFrozen = false; // ensure not stuck in detention freeze
+                    scheduleNextFreeze();
+                    if (arcadeCanvas) arcadeCanvas.focus();
+                    schoolhouseLoop();
+                    updateBaldiSpeech("Ти закрив Think Pad! Тікай, поки Балді не підійшов!");
+                } else {
+                    updateBaldiSpeech("Бронювання скасовано, бо ти злякався You Can Think Pad!");
+                }
             });
 
-            // Confirm Booking Action (Stage 5.1 & 5.2)
+            // School Period Timeslot definitions (Class Period Sync)
+            const CLASS_PERIOD_SLOTS = {
+                'slot_1': { name: '1 Пара (08:30 - 10:05)', startHour: 8, startMin: 30, endHour: 10, endMin: 5, durationMins: 95 },
+                'slot_2': { name: '2 Пара (10:20 - 11:55)', startHour: 10, startMin: 20, endHour: 11, endMin: 55, durationMins: 95 },
+                'slot_3': { name: '3 Пара (12:10 - 13:45)', startHour: 12, startMin: 10, endHour: 13, endMin: 45, durationMins: 95 },
+                'slot_4': { name: '4 Пара (14:00 - 15:35)', startHour: 14, startMin: 0, endHour: 15, endMin: 35, durationMins: 95 },
+                'quick_45': { name: 'Експрес-робота (45 хв)', durationMins: 45 },
+                'test_20': { name: 'Тестовий сеанс (20 сек)', durationSeconds: 20 }
+            };
+
+            function calculatePeriodWindow(slotKey) {
+                const now = new Date();
+                const slot = CLASS_PERIOD_SLOTS[slotKey] || CLASS_PERIOD_SLOTS['slot_1'];
+
+                if (slot.durationSeconds) {
+                    const sTime = now.getTime();
+                    return { startTime: sTime, endTime: sTime + slot.durationSeconds * 1000, slotName: slot.name };
+                }
+
+                if (slot.startHour !== undefined) {
+                    const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), slot.startHour, slot.startMin, 0, 0).getTime();
+                    const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), slot.endHour, slot.endMin, 0, 0).getTime();
+
+                    // If slot has passed for today, schedule it for the same time tomorrow or start from current window
+                    if (now.getTime() > endTime) {
+                        // Past today's lesson, schedule for tomorrow
+                        const nextStart = startTime + 24 * 60 * 60 * 1000;
+                        const nextEnd = endTime + 24 * 60 * 60 * 1000;
+                        return { startTime: nextStart, endTime: nextEnd, slotName: slot.name };
+                    }
+                    return { startTime: startTime, endTime: endTime, slotName: slot.name };
+                }
+
+                // Default standard relative duration (e.g. quick 45 mins)
+                const sTime = now.getTime();
+                const eTime = sTime + (slot.durationMins || 45) * 60 * 1000;
+                return { startTime: sTime, endTime: eTime, slotName: slot.name };
+            }
+
+            // Confirm Booking Action (Stage 5.1 & Class Period Sync)
             confirmBookingBtn.addEventListener('click', () => {
                 if (!state.selectedModalPc) return;
 
                 if (!state.profile.name || !state.profile.group) {
                     pcDetailsModal.classList.add('hidden');
                     triggerBaldiEmotion('angry');
-                    updateBaldiSpeech("Помилка! Спочатку вкажи своє ім'я та групу у профілі!");
+                    updateBaldiSpeech("Помилка! Спочатку авторизуйся зі списку 30 учнів у профілі!");
                     switchView('profile');
                     return;
                 }
@@ -2802,20 +2880,19 @@
                     return;
                 }
 
-                const durationMinutes = parseInt(sessionDurationSelect.value, 10);
-                const now = Date.now();
-                const durationMs = (durationMinutes === 20 && sessionDurationSelect.options[sessionDurationSelect.selectedIndex].text.includes('секунд'))
-                    ? 20 * 1000
-                    : durationMinutes * 60 * 1000;
+                const slotKey = sessionDurationSelect.value;
+                const windowTimes = calculatePeriodWindow(slotKey);
 
                 const bookingCandidate = {
                     pcId: state.selectedModalPc.id,
                     cabinet: state.activeCabinet,
                     userName: state.profile.name,
                     userGroup: state.profile.group,
-                    startTime: now,
-                    endTime: now + durationMs,
-                    durationMinutes: durationMinutes
+                    slotKey: slotKey,
+                    slotName: windowTimes.slotName,
+                    startTime: windowTimes.startTime,
+                    endTime: windowTimes.endTime,
+                    durationMinutes: Math.round((windowTimes.endTime - windowTimes.startTime) / 60000)
                 };
 
                 pcDetailsModal.classList.add('hidden');
@@ -2847,18 +2924,29 @@
                 return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }
 
-            // Main 1-second Interval Loop
+            // Main 1-second Interval Loop (with Lesson Period Sync)
             setInterval(() => {
                 if (state.booking) {
-                    const remainingSeconds = getTimeRemaining();
-
-                    if (remainingSeconds <= 0) {
-                        // Auto-Expiry reached 00:00 (Stage 5.3)
-                        handleAutoSessionExpiry();
+                    const now = Date.now();
+                    // Check if lesson has not yet started
+                    if (state.booking.startTime && now < state.booking.startTime) {
+                        const secondsUntilStart = Math.max(0, Math.floor((state.booking.startTime - now) / 1000));
+                        const formattedUntil = formatTime(secondsUntilStart);
+                        sessionTimerDisplay.textContent = `🕒 ПОЧАТОК ЧЕРЕЗ: ${formattedUntil}`;
+                        boardChalkTimer.textContent = `ПК #${state.booking.pcId} [СТАРТ: ${formattedUntil}]`;
+                        statusText.textContent = `Заброньовано: Каб. ${state.booking.cabinet} | ПК #${state.booking.pcId} (Початок за розкладом: ${state.booking.slotName || 'Пара'})`;
                     } else {
-                        const formatted = formatTime(remainingSeconds);
-                        sessionTimerDisplay.textContent = `⏳ ${formatted}`;
-                        boardChalkTimer.textContent = `СЕАНС: ПК #${state.booking.pcId} [${formatted}]`;
+                        const remainingSeconds = getTimeRemaining();
+
+                        if (remainingSeconds <= 0) {
+                            // Auto-Expiry reached 00:00 (Stage 5.3)
+                            handleAutoSessionExpiry();
+                        } else {
+                            const formatted = formatTime(remainingSeconds);
+                            sessionTimerDisplay.textContent = `⏳ ${formatted}`;
+                            boardChalkTimer.textContent = `СЕАНС: ПК #${state.booking.pcId} [${formatted}]`;
+                            statusText.textContent = `Активно: Каб. ${state.booking.cabinet} | ПК #${state.booking.pcId} (${state.booking.userName})`;
+                        }
                     }
                 } else {
                     boardChalkTimer.textContent = 'СЕАНС: НЕ АКТИВНИЙ';
@@ -2992,12 +3080,12 @@
 
             adminLoginBtn.addEventListener('click', () => {
                 const code = adminSecurityCodeInput.value.trim().toLowerCase();
-                if (code === 'school') {
+                if (code === '2384' || code === 'school') {
                     state.adminUnlocked = true;
                     adminAuthError.classList.add('hidden');
                     renderAdminView();
                     triggerBaldiEmotion('celebrate');
-                    updateBaldiSpeech("Двоетапну перевірку пройдено! Ласкаво просимо, шановний викладачу!");
+                    updateBaldiSpeech("Код доступу 2384 прийнято! Ласкаво просимо, шановний викладачу!");
                 } else {
                     adminAuthError.classList.remove('hidden');
                     triggerBaldiEmotion('angry');
@@ -3298,24 +3386,101 @@
             let baldiSchoolRulerTimer = 0;
             let baldiAngerLevel = 1; // Baldi moves faster as more notebooks collected
 
-            // 16x10 Grid Map for Pseudo-3D Raycasting
-            // 0: Floor / Hallway / Classroom interior
-            // 1: Blue perimeter & main structural school walls
-            // 2: Yellow hallway classroom walls
-            // 3: Wood/Brown Classroom Doors
+            // Random Game Freeze Event state
+            let isGameFrozen = false;
+            let freezeTimerEnd = 0;
+            let freezeEffectMessage = "DETENTION / GLITCH: PAUSED";
+            let nextFreezeTimestamp = 0;
+
+            function scheduleNextFreeze() {
+                // Random freeze interval between 15 and 45 seconds from now
+                const intervalSeconds = 15 + Math.random() * 30;
+                nextFreezeTimestamp = Date.now() + intervalSeconds * 1000;
+            }
+
+            // Multi-Room 16x12 Schoolhouse Grid Layout with Center Hallway & 4 Distinct Classroom Wings
+            // 0: Walkable corridor & classroom floor
+            // 1: Outer school perimeter & dividing brick walls
+            // 2: Classroom yellow drywall
+            // 3: Authentic Blue Classroom Entrance Door
             const MAP_W = 16;
-            const MAP_H = 10;
+            const MAP_H = 12;
             const schoolMap = [
                 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1,
-                1, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 1,
-                1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1,
-                1, 2, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 1,
-                1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-                1, 2, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 1,
-                1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1,
-                1, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 1,
+                1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, // Room 1 (TL) & Room 2 (TR)
+                1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+                1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+                1, 2, 2, 3, 2, 1, 0, 0, 0, 1, 2, 3, 2, 2, 2, 1, // Doors to Room 1 & 2
+                1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, // Main Central Hallway
+                1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, // Main Central Hallway
+                1, 2, 2, 3, 2, 1, 0, 0, 0, 1, 2, 3, 2, 2, 2, 1, // Doors to Room 3 & 4
+                1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+                1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, // Room 3 (BL) & Room 4 (BR)
+                1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
                 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+            ];
+
+            // Classroom Furniture: Structured grid of student desks, chairs, teacher podiums, and chalkboards
+            const schoolFurniture = [
+                // === CLASSROOM 1: Math Lab (Top-Left, x: 1..4, y: 1..3) ===
+                { type: 'blackboard', x: 2.5, y: 1.05, label: 'МАТЕМАТИКА: 1+1=?' },
+                { type: 'teacher_desk', x: 2.5, y: 1.6 }, // Teacher desk at the front
+                // Row 1
+                { type: 'desk', x: 1.8, y: 2.4 },
+                { type: 'chair', x: 1.8, y: 2.8 },
+                { type: 'desk', x: 3.2, y: 2.4 },
+                { type: 'chair', x: 3.2, y: 2.8 },
+                // Row 2
+                { type: 'desk', x: 1.8, y: 3.3 },
+                { type: 'chair', x: 1.8, y: 3.7 },
+                { type: 'desk', x: 3.2, y: 3.3 },
+                { type: 'chair', x: 3.2, y: 3.7 },
+
+                // === CLASSROOM 2: IT Lab (Top-Right, x: 11..14, y: 1..3) ===
+                { type: 'blackboard', x: 13.0, y: 1.05, label: 'КЛАС IT: FREEPC' },
+                { type: 'teacher_desk', x: 13.0, y: 1.6 }, // Teacher desk at the front
+                // Row 1
+                { type: 'desk', x: 12.0, y: 2.4 },
+                { type: 'chair', x: 12.0, y: 2.8 },
+                { type: 'desk', x: 13.8, y: 2.4 },
+                { type: 'chair', x: 13.8, y: 2.8 },
+                // Row 2
+                { type: 'desk', x: 12.0, y: 3.3 },
+                { type: 'chair', x: 12.0, y: 3.7 },
+                { type: 'desk', x: 13.8, y: 3.3 },
+                { type: 'chair', x: 13.8, y: 3.7 },
+
+                // === CLASSROOM 3: Science Room (Bottom-Left, x: 1..4, y: 8..10) ===
+                { type: 'blackboard', x: 2.5, y: 10.95, label: 'ТИХО! ЙДЕ УРОК' },
+                { type: 'teacher_desk', x: 2.5, y: 10.4 }, // Teacher desk at the front
+                // Row 1
+                { type: 'desk', x: 1.8, y: 9.5 },
+                { type: 'chair', x: 1.8, y: 9.1 },
+                { type: 'desk', x: 3.2, y: 9.5 },
+                { type: 'chair', x: 3.2, y: 9.1 },
+                // Row 2
+                { type: 'desk', x: 1.8, y: 8.5 },
+                { type: 'chair', x: 1.8, y: 8.1 },
+                { type: 'desk', x: 3.2, y: 8.5 },
+                { type: 'chair', x: 3.2, y: 8.1 },
+
+                // === CLASSROOM 4: Faculty Office (Bottom-Right, x: 11..14, y: 8..10) ===
+                { type: 'blackboard', x: 13.0, y: 10.95, label: 'БАЛДІ ЛЮБИТЬ ЧИСЛА' },
+                { type: 'teacher_desk', x: 13.0, y: 10.4 }, // Teacher desk at the front
+                // Row 1
+                { type: 'desk', x: 12.0, y: 9.5 },
+                { type: 'chair', x: 12.0, y: 9.1 },
+                { type: 'desk', x: 13.8, y: 9.5 },
+                { type: 'chair', x: 13.8, y: 9.1 },
+                // Row 2
+                { type: 'desk', x: 12.0, y: 8.5 },
+                { type: 'chair', x: 12.0, y: 8.1 },
+                { type: 'desk', x: 13.8, y: 8.5 },
+                { type: 'chair', x: 13.8, y: 8.1 },
+
+                // === CENTRAL CORRIDOR (Faculty / Principal Checkpoint Desk) ===
+                { type: 'teacher_desk', x: 8.0, y: 5.5 },
+                { type: 'chair', x: 8.0, y: 6.1 }
             ];
 
             function getMapCell(x, y) {
@@ -3327,7 +3492,7 @@
 
             // Pseudo-3D Player state: grid coordinates, viewing angle and Field of View
             let schoolPlayer = {
-                x: 2.5,
+                x: 7.5,
                 y: 5.5,
                 angle: 0, // In radians
                 speed: 0.052,
@@ -3335,20 +3500,35 @@
                 fov: Math.PI / 3 // 60 degrees Field of View
             };
 
-            // Baldi 3D entity state
+            // Baldi 3D entity & Hearing AI state
             let schoolBaldi = {
                 x: 13.5,
                 y: 5.5,
-                speed: 0.022
+                speed: 0.016,
+                baseSpeed: 0.016,
+                targetX: 7.5,
+                targetY: 5.5,
+                hearingAlertTimer: 0
             };
 
-            // 5 Notebook 3D billboard positions inside school classrooms
+            // Sound Event Registry: broadcasts sound coordinates to Baldi's Hearing System
+            function emitSchoolNoise(noiseX, noiseY, priority = 'normal') {
+                schoolBaldi.targetX = noiseX;
+                schoolBaldi.targetY = noiseY;
+                schoolBaldi.hearingAlertTimer = (priority === 'high') ? 120 : 60;
+                // If high priority (wrong answer, door slam, running), increase step immediacy
+                if (priority === 'high') {
+                    schoolBaldi.speed = Math.min(0.055, schoolBaldi.speed + 0.003);
+                }
+            }
+
+            // 5 Notebooks mounted neatly on top of specific student desks
             let schoolNotebooks = [
-                { id: 1, x: 2.0, y: 2.0, collected: false, color: '#00e5ff', label: '1' },
-                { id: 2, x: 6.5, y: 2.0, collected: false, color: '#ffff00', label: '2' },
-                { id: 3, x: 10.5, y: 2.0, collected: false, color: '#ff4081', label: '3' },
-                { id: 4, x: 2.0, y: 8.0, collected: false, color: '#76ff03', label: '4' },
-                { id: 5, x: 10.5, y: 8.0, collected: false, color: '#ff6d00', label: '5' }
+                { id: 1, x: 1.8, y: 2.4, collected: false, color: '#00e5ff', label: '1' }, // Desk in Room 1 (Math Lab)
+                { id: 2, x: 12.0, y: 2.4, collected: false, color: '#ffff00', label: '2' }, // Desk in Room 2 (IT Lab)
+                { id: 3, x: 8.0, y: 5.5, collected: false, color: '#ff4081', label: '3' }, // Corridor Checkpoint Desk
+                { id: 4, x: 1.8, y: 9.5, collected: false, color: '#76ff03', label: '4' }, // Desk in Room 3 (Science)
+                { id: 5, x: 13.8, y: 9.5, collected: false, color: '#ff6d00', label: '5' } // Desk in Room 4 (Faculty)
             ];
 
             let schoolKeys = { up: false, down: false, left: false, right: false };
@@ -3382,7 +3562,7 @@
                 } else {
                     tabModeCatcher.classList.remove('active');
                     tabModeSchoolhouse.classList.add('active');
-                    arcadeRulesHint.innerHTML = "🏫 <strong>Режим «3D Школа Baldi»:</strong> Огляд мишкою як у Minecraft (клікни по екрану), ходьба WASD (W/S — вперед/назад, A/D — стрейф). Знайди 5 зошитів у класах!";
+                    arcadeRulesHint.innerHTML = "🏫 <strong>Classic Baldi's Basics Schoolhouse 3D</strong>";
                     arcadeCatcherControls.style.display = 'none';
                     arcadeSchoolControls.style.display = 'flex';
                     if (arcade3dCrosshair) arcade3dCrosshair.style.display = 'block';
@@ -3581,14 +3761,22 @@
                 schoolRunning = true;
                 notebooksCollected = 0;
                 baldiAngerLevel = 1;
-                schoolPlayer.x = 2.5;
+                schoolPlayer.x = 7.5;
                 schoolPlayer.y = 5.5;
                 schoolPlayer.angle = 0;
                 schoolBaldi.x = 13.5;
                 schoolBaldi.y = 5.5;
-                schoolBaldi.speed = 0.022;
+                schoolBaldi.speed = 0.016;
+                schoolBaldi.baseSpeed = 0.016;
+                schoolBaldi.targetX = 7.5;
+                schoolBaldi.targetY = 5.5;
+                schoolBaldi.hearingAlertTimer = 0;
 
                 schoolNotebooks.forEach(nb => nb.collected = false);
+
+                // Schedule initial random freeze event (15 to 45 seconds)
+                isGameFrozen = false;
+                scheduleNextFreeze();
 
                 if (startBaldiGameBtn) startBaldiGameBtn.textContent = 'ПЕРЕЗАПУСК ШКОЛИ';
                 updateSchoolHeader();
@@ -3605,63 +3793,102 @@
 
             function isBlockingWall(x, y) {
                 const cell = getMapCell(x, y);
-                return cell !== 0;
+                if (cell === 0) return false;
+                // Classroom doors (type 3) open smoothly when approaching close to them!
+                if (cell === 3) return false;
+                return true;
             }
 
             function schoolhouseLoop() {
                 if (!schoolRunning || !arcadeCtx) return;
 
+                const now = Date.now();
+
+                // Check Random Game Freeze Event triggers
+                if (!isGameFrozen && now >= nextFreezeTimestamp) {
+                    isGameFrozen = true;
+                    // Freeze for 3.5 seconds (glitch detention pause)
+                    freezeTimerEnd = now + 3500;
+                    playRetroSound('wrong');
+                } else if (isGameFrozen && now >= freezeTimerEnd) {
+                    isGameFrozen = false;
+                    scheduleNextFreeze();
+                }
+
                 // 1. Controls & Player Movement in 3D (Forward, Backward, Strafe Left, Strafe Right)
                 let moveStep = 0;
                 let strafeStep = 0;
 
-                if (schoolKeys.up) moveStep += schoolPlayer.speed;
-                if (schoolKeys.down) moveStep -= schoolPlayer.speed;
-                if (schoolKeys.left) strafeStep -= schoolPlayer.speed;
-                if (schoolKeys.right) strafeStep += schoolPlayer.speed;
+                // When frozen, prevent all movement and controls!
+                if (!isGameFrozen) {
+                    if (schoolKeys.up) moveStep += schoolPlayer.speed;
+                    if (schoolKeys.down) moveStep -= schoolPlayer.speed;
+                    if (schoolKeys.left) strafeStep -= schoolPlayer.speed;
+                    if (schoolKeys.right) strafeStep += schoolPlayer.speed;
 
-                if (moveStep !== 0 || strafeStep !== 0) {
-                    // Combine forward/backward movement with strafing relative to camera angle
-                    const forwardX = Math.cos(schoolPlayer.angle) * moveStep;
-                    const forwardY = Math.sin(schoolPlayer.angle) * moveStep;
-                    // Strafe vector is perpendicular: angle + 90 degrees
-                    const strafeX = Math.cos(schoolPlayer.angle + Math.PI / 2) * strafeStep;
-                    const strafeY = Math.sin(schoolPlayer.angle + Math.PI / 2) * strafeStep;
+                    if (moveStep !== 0 || strafeStep !== 0) {
+                        // Combine forward/backward movement with strafing relative to camera angle
+                        const forwardX = Math.cos(schoolPlayer.angle) * moveStep;
+                        const forwardY = Math.sin(schoolPlayer.angle) * moveStep;
+                        // Strafe vector is perpendicular: angle + 90 degrees
+                        const strafeX = Math.cos(schoolPlayer.angle + Math.PI / 2) * strafeStep;
+                        const strafeY = Math.sin(schoolPlayer.angle + Math.PI / 2) * strafeStep;
 
-                    let totalDx = forwardX + strafeX;
-                    let totalDy = forwardY + strafeY;
+                        let totalDx = forwardX + strafeX;
+                        let totalDy = forwardY + strafeY;
 
-                    // Normalize diagonal movement
-                    if (moveStep !== 0 && strafeStep !== 0) {
-                        totalDx *= 0.7071;
-                        totalDy *= 0.7071;
-                    }
+                        // Normalize diagonal movement
+                        if (moveStep !== 0 && strafeStep !== 0) {
+                            totalDx *= 0.7071;
+                            totalDy *= 0.7071;
+                        }
 
-                    const margin = 0.22;
-                    const checkX = schoolPlayer.x + totalDx + Math.sign(totalDx) * margin;
-                    const checkY = schoolPlayer.y + totalDy + Math.sign(totalDy) * margin;
+                        const margin = 0.22;
+                        const checkX = schoolPlayer.x + totalDx + Math.sign(totalDx) * margin;
+                        const checkY = schoolPlayer.y + totalDy + Math.sign(totalDy) * margin;
 
-                    if (!isBlockingWall(checkX, schoolPlayer.y)) {
-                        schoolPlayer.x += totalDx;
-                    }
-                    if (!isBlockingWall(schoolPlayer.x, checkY)) {
-                        schoolPlayer.y += totalDy;
+                        const prevCell = getMapCell(schoolPlayer.x, schoolPlayer.y);
+
+                        if (!isBlockingWall(checkX, schoolPlayer.y)) {
+                            schoolPlayer.x += totalDx;
+                        }
+                        if (!isBlockingWall(schoolPlayer.x, checkY)) {
+                            schoolPlayer.y += totalDy;
+                        }
+
+                        // Door step sound detection: entering door cell creates sound that alerts Baldi!
+                        const currentCell = getMapCell(schoolPlayer.x, schoolPlayer.y);
+                        if (prevCell !== 3 && currentCell === 3) {
+                            emitSchoolNoise(schoolPlayer.x, schoolPlayer.y, 'high'); // Baldi hears door opening!
+                        } else if (Math.random() < 0.04) {
+                            // Occasional footstep sound emission
+                            emitSchoolNoise(schoolPlayer.x, schoolPlayer.y, 'normal');
+                        }
                     }
                 }
 
-                // 2. Baldi 3D AI Chase & Slap Sound
-                baldiSchoolRulerTimer++;
-                const slapInterval = Math.max(12, Math.floor(45 - (schoolBaldi.speed * 800)));
-                if (baldiSchoolRulerTimer % slapInterval === 0) {
-                    playRetroSound('slap');
+                // 2. Authentic Audio-Driven Baldi AI (Sound Tracking & Ruler Slap Cadence)
+                if (!isGameFrozen) {
+                    baldiSchoolRulerTimer++;
+                    // Ruler slap interval scales directly with Baldi's speed (faster slap cadence)
+                    const slapInterval = Math.max(12, Math.floor(48 - (schoolBaldi.speed * 700)));
+                    if (baldiSchoolRulerTimer % slapInterval === 0) {
+                        playRetroSound('slap');
+                    }
+
+                    // Sound Tracking: Baldi moves directly toward the last registered sound coordinates
+                    const targetX = (schoolBaldi.hearingAlertTimer > 0) ? schoolBaldi.targetX : schoolPlayer.x;
+                    const targetY = (schoolBaldi.hearingAlertTimer > 0) ? schoolBaldi.targetY : schoolPlayer.y;
+
+                    if (schoolBaldi.hearingAlertTimer > 0) schoolBaldi.hearingAlertTimer--;
+
+                    const bAngle = Math.atan2(targetY - schoolBaldi.y, targetX - schoolBaldi.x);
+                    const bNextX = schoolBaldi.x + Math.cos(bAngle) * schoolBaldi.speed;
+                    const bNextY = schoolBaldi.y + Math.sin(bAngle) * schoolBaldi.speed;
+
+                    if (!isBlockingWall(bNextX, schoolBaldi.y)) schoolBaldi.x = bNextX;
+                    if (!isBlockingWall(schoolBaldi.x, bNextY)) schoolBaldi.y = bNextY;
                 }
-
-                const bAngle = Math.atan2(schoolPlayer.y - schoolBaldi.y, schoolPlayer.x - schoolBaldi.x);
-                const bNextX = schoolBaldi.x + Math.cos(bAngle) * schoolBaldi.speed;
-                const bNextY = schoolBaldi.y + Math.sin(bAngle) * schoolBaldi.speed;
-
-                if (!isBlockingWall(bNextX, schoolBaldi.y)) schoolBaldi.x = bNextX;
-                if (!isBlockingWall(schoolBaldi.x, bNextY)) schoolBaldi.y = bNextY;
 
                 // 3. Notebook Collision Check
                 schoolNotebooks.forEach(nb => {
@@ -3671,7 +3898,9 @@
                             nb.collected = true;
                             notebooksCollected++;
                             baldiAngerLevel++;
-                            schoolBaldi.speed += 0.007; // Baldi steps faster in 3D
+                            // Progressive Speed Scaling: starts gentle (0.016), scales gradually per notebook
+                            schoolBaldi.speed = schoolBaldi.baseSpeed + (notebooksCollected * 0.0055);
+                            emitSchoolNoise(nb.x, nb.y, 'high'); // Baldi hears the notebook chime!
                             updateSchoolHeader();
                             playRetroSound('notebook');
 
@@ -3698,6 +3927,8 @@
                                     quizFeedback.style.color = "#d32f2f";
                                     schoolBaldi.speed += 0.012; // Extra speed penalty for mistakes
                                     baldiAngerLevel = Math.min(5, baldiAngerLevel + 1);
+                                    // Wrong answer sound instantly alerts Baldi to player's room!
+                                    emitSchoolNoise(schoolPlayer.x, schoolPlayer.y, 'high');
                                     updateSchoolHeader();
                                     triggerBaldiEmotion('angry');
                                 }
@@ -3720,27 +3951,45 @@
                     return;
                 }
 
-                // 4. Pseudo-3D Raycasting Engine (Rendering First-Person Perspective)
+                // 4. Pseudo-3D Raycasting Engine (Rendering First-Person Perspective with Classic Baldi Textures)
                 const cWidth = arcadeCanvas.width;
                 const cHeight = arcadeCanvas.height;
                 const halfH = cHeight / 2;
 
-                // Render Ceiling (School classroom acoustic ceiling tiles)
-                arcadeCtx.fillStyle = '#1a237e'; // Retro blue ceiling
+                // Render Ceiling (Speckled / textured acoustic schoolhouse ceiling)
+                arcadeCtx.fillStyle = '#b0bec5'; // Base speckled ceiling grey
                 arcadeCtx.fillRect(0, 0, cWidth, halfH);
+                for (let cy = 0; cy < halfH; cy += 12) {
+                    arcadeCtx.fillStyle = (cy % 24 === 0) ? '#90a4ae' : '#cfd8dc';
+                    arcadeCtx.fillRect(0, cy, cWidth, 2);
+                    // Add speckles
+                    arcadeCtx.fillStyle = '#546e7a';
+                    for (let cx = 10; cx < cWidth; cx += 22) {
+                        arcadeCtx.fillRect((cx + (cy * 7) % 31) % cWidth, cy + 3, 2, 2);
+                    }
+                }
 
-                // Render Floor with linoleum yellow perspective gradient
-                arcadeCtx.fillStyle = '#fff9c4'; // Linoleum yellow school floor
+                // Render Fluorescent corridor ceiling lights
+                arcadeCtx.fillStyle = '#ffffff';
+                arcadeCtx.fillRect(cWidth * 0.35, 12, cWidth * 0.3, 14);
+                arcadeCtx.strokeStyle = '#78909c';
+                arcadeCtx.lineWidth = 2;
+                arcadeCtx.strokeRect(cWidth * 0.35, 12, cWidth * 0.3, 14);
+
+                // Render Floor with classic Baldi brown wood/carpet grain pattern
+                arcadeCtx.fillStyle = '#bcaaa4'; // Classic Baldi floor grain
                 arcadeCtx.fillRect(0, halfH, cWidth, halfH);
 
-                // Floor tile lines
-                arcadeCtx.strokeStyle = '#fbc02d';
-                arcadeCtx.lineWidth = 1;
-                for (let y = halfH; y < cHeight; y += 18) {
-                    arcadeCtx.beginPath();
-                    arcadeCtx.moveTo(0, y);
-                    arcadeCtx.lineTo(cWidth, y);
-                    arcadeCtx.stroke();
+                // Floor planks / wood grain perspective lines
+                for (let y = halfH; y < cHeight; y += 10) {
+                    const rowRatio = (y - halfH) / halfH;
+                    arcadeCtx.fillStyle = (Math.floor(y / 10) % 2 === 0) ? '#a1887f' : '#8d6e63';
+                    arcadeCtx.fillRect(0, y, cWidth, Math.max(1, Math.floor(rowRatio * 4)));
+                    // Horizontal wood grain speckles
+                    arcadeCtx.fillStyle = '#6d4c41';
+                    for (let fx = 15; fx < cWidth; fx += 35) {
+                        arcadeCtx.fillRect((fx + Math.floor(y * 13)) % cWidth, y + 2, 3, 1);
+                    }
                 }
 
                 const numRays = 140; // 140 vertical columns for crisp 90s pixel aesthetic
@@ -3754,11 +4003,10 @@
 
                     let dist = 0;
                     let hitWallType = 0;
-                    let sideHit = 0; // 0: X-wall, 1: Y-wall
+                    let hitCoordX = 0;
+                    let hitCoordY = 0;
 
                     // DDA Raycasting Step
-                    const mapCheckX = Math.floor(schoolPlayer.x);
-                    const mapCheckY = Math.floor(schoolPlayer.y);
                     const stepSize = 0.035;
                     const maxDist = 18;
 
@@ -3773,6 +4021,8 @@
                         const cell = getMapCell(cx, cy);
                         if (cell > 0) {
                             hitWallType = cell;
+                            hitCoordX = cx;
+                            hitCoordY = cy;
                             break;
                         }
                     }
@@ -3784,40 +4034,76 @@
                     const wallHeight = Math.min(cHeight * 1.6, (cHeight / Math.max(0.001, correctedDist)));
                     const wallTop = Math.max(0, halfH - wallHeight / 2);
 
-                    // Colors by wall type:
-                    // 1: Iconic Baldi Blue Wall (#1565c0)
-                    // 2: Classroom Hallway Yellow Wall (#fbc02d)
-                    // 3: Wood Door with Window & Brass Knob (#8d6e63)
-                    let wallColor = '#1565c0';
-                    if (hitWallType === 2) wallColor = '#fbc02d';
-                    if (hitWallType === 3) wallColor = '#8d6e63';
+                    // Authentic Baldi Textures:
+                    // 1 & 2: Classic Baldi school grey brick / tile corridor walls
+                    // 3: Authentic Blue Classroom Door with Glass Window & Knob
+                    if (hitWallType === 1 || hitWallType === 2) {
+                        // Base grey brick wall color
+                        arcadeCtx.fillStyle = (hitWallType === 2) ? '#cfd8dc' : '#b0bec5';
+                        arcadeCtx.fillRect(r * colWidth, wallTop, colWidth + 1, wallHeight);
 
-                    arcadeCtx.fillStyle = wallColor;
-                    arcadeCtx.fillRect(r * colWidth, wallTop, colWidth + 1, wallHeight);
-
-                    // Authentic classroom door styling: glass window and panel line
-                    if (hitWallType === 3) {
-                        // Glass panel window on the upper half of the door
-                        const windowTop = wallTop + wallHeight * 0.18;
-                        const windowH = wallHeight * 0.28;
-                        arcadeCtx.fillStyle = '#81d4fa'; // Translucent light blue classroom glass
-                        arcadeCtx.fillRect(r * colWidth + 1, windowTop, colWidth - 1, windowH);
-
-                        // Door knob level highlight
-                        const knobY = wallTop + wallHeight * 0.55;
-                        if (r % 8 === 0) {
-                            arcadeCtx.fillStyle = '#ffd600'; // Brass knob
-                            arcadeCtx.fillRect(r * colWidth, knobY, colWidth + 1, wallHeight * 0.05);
+                        // Horizontal brick mortar lines
+                        const brickLayers = 14;
+                        for (let bl = 1; bl < brickLayers; bl++) {
+                            const mortarY = wallTop + (wallHeight / brickLayers) * bl;
+                            arcadeCtx.fillStyle = '#78909c';
+                            arcadeCtx.fillRect(r * colWidth, mortarY, colWidth + 1, Math.max(1, Math.floor(2 / correctedDist)));
                         }
 
+                        // Vertical brick lines pattern
+                        const wallU = (Math.abs(hitCoordX - Math.round(hitCoordX)) > Math.abs(hitCoordY - Math.round(hitCoordY)))
+                            ? hitCoordX
+                            : hitCoordY;
+                        const tileStep = Math.floor((wallU * 8) % 4);
+                        if (tileStep === 0 && r % 4 === 0) {
+                            arcadeCtx.fillStyle = '#607d8b';
+                            arcadeCtx.fillRect(r * colWidth, wallTop, 1, wallHeight);
+                        }
+
+                        // Baseboard strip (bottom dark runner)
+                        const baseboardH = Math.max(2, wallHeight * 0.08);
+                        arcadeCtx.fillStyle = '#455a64';
+                        arcadeCtx.fillRect(r * colWidth, wallTop + wallHeight - baseboardH, colWidth + 1, baseboardH);
+                    } else if (hitWallType === 3) {
+                        // Authentic Blue Classroom Door (as in classic Baldi's Basics)
+                        arcadeCtx.fillStyle = '#1565c0';
+                        arcadeCtx.fillRect(r * colWidth, wallTop, colWidth + 1, wallHeight);
+
                         // Door frame shading
-                        arcadeCtx.fillStyle = 'rgba(0,0,0,0.3)';
-                        arcadeCtx.fillRect(r * colWidth + 1, wallTop, 1, wallHeight);
+                        arcadeCtx.fillStyle = '#0d47a1';
+                        arcadeCtx.fillRect(r * colWidth, wallTop, 1, wallHeight);
+
+                        // Classroom Door Window (Upper Blue / Glass panel)
+                        const windowTop = wallTop + wallHeight * 0.16;
+                        const windowH = wallHeight * 0.32;
+                        arcadeCtx.fillStyle = '#81d4fa'; // Translucent glass window
+                        arcadeCtx.fillRect(r * colWidth + 1, windowTop, colWidth - 1, windowH);
+
+                        // Horizontal window grille bars
+                        arcadeCtx.fillStyle = '#0d47a1';
+                        arcadeCtx.fillRect(r * colWidth, windowTop + windowH * 0.5, colWidth + 1, Math.max(1, 2 / correctedDist));
+
+                        // Door knob level brass highlight
+                        const knobY = wallTop + wallHeight * 0.56;
+                        if (r % 6 === 0) {
+                            arcadeCtx.fillStyle = '#ffd600'; // Brass knob
+                            arcadeCtx.fillRect(r * colWidth, knobY, colWidth + 1, wallHeight * 0.045);
+                        }
                     }
                 }
 
-                // 5. Render 3D Sprite Billboards (Notebooks & Baldi)
+                // 5. Render 3D Sprite Billboards (Classroom Desks, Blackboards, Chairs, Notebooks & Baldi)
                 const sprites = [];
+
+                // Add Classroom Furniture (Desks, Chairs, Chalkboards)
+                schoolFurniture.forEach(f => {
+                    sprites.push({
+                        type: f.type,
+                        x: f.x,
+                        y: f.y,
+                        label: f.label
+                    });
+                });
 
                 // Add active Notebooks to sprite list
                 schoolNotebooks.forEach(nb => {
@@ -3864,60 +4150,224 @@
                         // Check Z-buffer occlusion (don't draw behind walls)
                         const rayIndex = Math.floor((screenX / cWidth) * numRays);
                         if (rayIndex >= 0 && rayIndex < numRays && s.dist < zBuffer[rayIndex] + 0.3) {
-                            if (s.type === 'notebook') {
-                                // Draw 3D Notebook Billboard
+                            if (s.type === 'teacher_desk') {
+                                // Draw Balanced Teacher's Podium Desk at the front of the classroom (Properly proportioned)
+                                const tdW = Math.min(cWidth * 0.55, spriteSize * 0.68);
+                                const tdH = Math.min(cHeight * 0.42, spriteSize * 0.36);
+                                const tdLeft = screenX - tdW / 2;
+                                const tdTop = halfH + spriteSize * 0.16;
+
+                                // Podium wood texture
+                                arcadeCtx.fillStyle = '#8d6e63';
+                                arcadeCtx.fillRect(tdLeft, tdTop, tdW, tdH * 0.4);
+                                arcadeCtx.strokeStyle = '#3e2723';
+                                arcadeCtx.lineWidth = Math.max(1.5, Math.min(4, 3 / s.dist));
+                                arcadeCtx.strokeRect(tdLeft, tdTop, tdW, tdH * 0.4);
+
+                                // Front wooden modesty panel & legs
+                                arcadeCtx.fillStyle = '#5d4037';
+                                arcadeCtx.fillRect(tdLeft + tdW * 0.05, tdTop + tdH * 0.4, tdW * 0.9, tdH * 0.6);
+                                arcadeCtx.strokeRect(tdLeft + tdW * 0.05, tdTop + tdH * 0.4, tdW * 0.9, tdH * 0.6);
+
+                                // Teacher Desk Label (Properly clamped font)
+                                const fontSize = Math.min(15, Math.max(8, Math.floor(spriteSize * 0.09)));
+                                arcadeCtx.fillStyle = '#ffeb3b';
+                                arcadeCtx.font = `bold ${fontSize}px sans-serif`;
+                                arcadeCtx.textAlign = 'center';
+                                arcadeCtx.fillText("СТІЛ ВЧИТЕЛЯ", screenX, tdTop + tdH * 0.28);
+                            } else if (s.type === 'desk') {
+                                // Draw 3D Classroom Wooden Desk Billboard
+                                const dW = spriteSize * 0.75;
+                                const dH = spriteSize * 0.45;
+                                const dLeft = screenX - dW / 2;
+                                const dTop = halfH + spriteSize * 0.12;
+
+                                // Desk surface (Wood brown)
+                                arcadeCtx.fillStyle = '#bcaaa4';
+                                arcadeCtx.fillRect(dLeft, dTop, dW, dH * 0.35);
+                                arcadeCtx.strokeStyle = '#3e2723';
+                                arcadeCtx.lineWidth = Math.max(1, 3 / s.dist);
+                                arcadeCtx.strokeRect(dLeft, dTop, dW, dH * 0.35);
+
+                                // Metal desk legs (Classic school desk)
+                                arcadeCtx.fillStyle = '#424242';
+                                arcadeCtx.fillRect(dLeft + dW * 0.1, dTop + dH * 0.35, dW * 0.08, dH * 0.65);
+                                arcadeCtx.fillRect(dLeft + dW * 0.82, dTop + dH * 0.35, dW * 0.08, dH * 0.65);
+
+                                // Desktop label
+                                arcadeCtx.fillStyle = '#212121';
+                                arcadeCtx.font = `bold ${Math.max(9, Math.floor(spriteSize * 0.12))}px sans-serif`;
+                                arcadeCtx.textAlign = 'center';
+                                arcadeCtx.fillText("ПАРТА УЧНЯ", screenX, dTop + dH * 0.25);
+                            } else if (s.type === 'chair') {
+                                // Draw Student Classroom Chair
+                                const chW = spriteSize * 0.38;
+                                const chH = spriteSize * 0.55;
+                                const chLeft = screenX - chW / 2;
+                                const chTop = halfH + spriteSize * 0.05;
+
+                                // Chair Backrest (Brown wood)
+                                arcadeCtx.fillStyle = '#8d6e63';
+                                arcadeCtx.fillRect(chLeft, chTop, chW, chH * 0.4);
+                                arcadeCtx.strokeStyle = '#000';
+                                arcadeCtx.lineWidth = 1;
+                                arcadeCtx.strokeRect(chLeft, chTop, chW, chH * 0.4);
+
+                                // Chair Legs
+                                arcadeCtx.fillStyle = '#212121';
+                                arcadeCtx.fillRect(chLeft + chW * 0.15, chTop + chH * 0.4, chW * 0.1, chH * 0.6);
+                                arcadeCtx.fillRect(chLeft + chW * 0.75, chTop + chH * 0.4, chW * 0.1, chH * 0.6);
+                            } else if (s.type === 'blackboard') {
+                                // Draw Classroom Wall Chalkboard / Blackboard
+                                const bW = spriteSize * 1.1;
+                                const bH = spriteSize * 0.6;
+                                const bLeft = screenX - bW / 2;
+                                const bTop = halfH - spriteSize * 0.35;
+
+                                // Wooden frame
+                                arcadeCtx.fillStyle = '#6d4c41';
+                                arcadeCtx.fillRect(bLeft, bTop, bW, bH);
+                                arcadeCtx.strokeStyle = '#3e2723';
+                                arcadeCtx.lineWidth = Math.max(2, 4 / s.dist);
+                                arcadeCtx.strokeRect(bLeft, bTop, bW, bH);
+
+                                // Dark Chalkboard Green surface
+                                arcadeCtx.fillStyle = '#1b5e20';
+                                arcadeCtx.fillRect(bLeft + bW * 0.05, bTop + bH * 0.08, bW * 0.9, bH * 0.84);
+
+                                // Chalkboard inscription
+                                arcadeCtx.fillStyle = '#ffffff';
+                                arcadeCtx.font = `900 ${Math.max(8, Math.floor(spriteSize * 0.11))}px "Courier New"`;
+                                arcadeCtx.textAlign = 'center';
+                                arcadeCtx.fillText(s.label || 'ДОШКА', screenX, bTop + bH * 0.5);
+
+                                // Chalk tray
+                                arcadeCtx.fillStyle = '#d7ccc8';
+                                arcadeCtx.fillRect(bLeft + bW * 0.1, bTop + bH * 0.92, bW * 0.8, bH * 0.08);
+                            } else if (s.type === 'notebook') {
+                                // Draw 3D Notebook Billboard Mounted on Desk
+                                const nW = spriteSize * 0.45;
+                                const nH = spriteSize * 0.55;
+                                const nLeft = screenX - nW / 2;
+                                const nTop = halfH + spriteSize * 0.02; // Positioned right above the desk surface
+
                                 arcadeCtx.fillStyle = s.color;
-                                arcadeCtx.fillRect(screenX - spriteSize * 0.25, spriteTop + spriteSize * 0.3, spriteSize * 0.5, spriteSize * 0.6);
+                                arcadeCtx.fillRect(nLeft, nTop, nW, nH);
                                 arcadeCtx.strokeStyle = '#000';
                                 arcadeCtx.lineWidth = Math.max(1, 3 / s.dist);
-                                arcadeCtx.strokeRect(screenX - spriteSize * 0.25, spriteTop + spriteSize * 0.3, spriteSize * 0.5, spriteSize * 0.6);
+                                arcadeCtx.strokeRect(nLeft, nTop, nW, nH);
 
+                                // Notebook spine and spiral
+                                arcadeCtx.fillStyle = '#ffffff';
+                                arcadeCtx.fillRect(nLeft, nTop, nW * 0.18, nH);
                                 arcadeCtx.fillStyle = '#000';
-                                arcadeCtx.font = `900 ${Math.max(10, Math.floor(spriteSize * 0.25))}px "Courier New"`;
+                                arcadeCtx.font = `900 ${Math.max(10, Math.floor(spriteSize * 0.2))}px "Courier New"`;
                                 arcadeCtx.textAlign = 'center';
-                                arcadeCtx.fillText(`📓#${s.id}`, screenX, spriteTop + spriteSize * 0.65);
+                                arcadeCtx.fillText(`📓#${s.id}`, screenX + nW * 0.05, nTop + nH * 0.6);
                             } else if (s.type === 'baldi') {
-                                // Draw 3D Baldi Billboard (Iconic Green Sweater, Head & Ruler)
-                                const bW = spriteSize * 0.55;
-                                const bH = spriteSize * 0.95;
+                                // Draw Authentic 2D Sprite Baldi Standing in the Corridor (Matching Reference)
+                                const bW = spriteSize * 0.52;
+                                const bH = spriteSize * 1.15;
                                 const bLeft = screenX - bW / 2;
-                                const bTop = halfH - bH / 2;
+                                const bTop = halfH - bH * 0.42;
 
-                                // Baldi Body (Green sweater)
+                                // Baldi Body (Iconic bright green long-sleeve sweater)
                                 arcadeCtx.fillStyle = '#00c853';
-                                arcadeCtx.fillRect(bLeft + bW * 0.15, bTop + bH * 0.35, bW * 0.7, bH * 0.45);
-                                arcadeCtx.strokeStyle = '#000';
-                                arcadeCtx.lineWidth = Math.max(2, 4 / s.dist);
-                                arcadeCtx.strokeRect(bLeft + bW * 0.15, bTop + bH * 0.35, bW * 0.7, bH * 0.45);
+                                arcadeCtx.fillRect(bLeft + bW * 0.22, bTop + bH * 0.32, bW * 0.56, bH * 0.32);
+                                arcadeCtx.strokeStyle = '#000000';
+                                arcadeCtx.lineWidth = Math.max(1.5, 3 / s.dist);
+                                arcadeCtx.strokeRect(bLeft + bW * 0.22, bTop + bH * 0.32, bW * 0.56, bH * 0.32);
 
-                                // Baldi Head (Bald with smile)
-                                arcadeCtx.fillStyle = '#ffe0bd';
+                                // Baldi Blue skinny pencil legs
+                                arcadeCtx.fillStyle = '#283593'; // Deep blue trousers
+                                const legW = Math.max(2, bW * 0.1);
+                                const legH = bH * 0.38;
+                                const legY = bTop + bH * 0.64;
+                                // Left leg
+                                arcadeCtx.fillRect(bLeft + bW * 0.32, legY, legW, legH);
+                                arcadeCtx.strokeRect(bLeft + bW * 0.32, legY, legW, legH);
+                                // Right leg
+                                arcadeCtx.fillRect(bLeft + bW * 0.58, legY, legW, legH);
+                                arcadeCtx.strokeRect(bLeft + bW * 0.58, legY, legW, legH);
+
+                                // Shoes (Brown shoes)
+                                arcadeCtx.fillStyle = '#3e2723';
+                                arcadeCtx.fillRect(bLeft + bW * 0.28, legY + legH - 4, legW + 4, 5);
+                                arcadeCtx.fillRect(bLeft + bW * 0.54, legY + legH - 4, legW + 4, 5);
+
+                                // Raised Waving Left Arm (As seen in classic reference art)
+                                arcadeCtx.strokeStyle = '#00c853';
+                                arcadeCtx.lineWidth = Math.max(2, bW * 0.1);
                                 arcadeCtx.beginPath();
-                                arcadeCtx.arc(screenX, bTop + bH * 0.22, bW * 0.22, 0, Math.PI * 2);
-                                arcadeCtx.fill();
+                                arcadeCtx.moveTo(bLeft + bW * 0.22, bTop + bH * 0.36);
+                                arcadeCtx.lineTo(bLeft - bW * 0.12, bTop + bH * 0.36);
+                                arcadeCtx.lineTo(bLeft - bW * 0.12, bTop + bH * 0.18);
                                 arcadeCtx.stroke();
 
-                                // Baldi Ruler in hand
-                                arcadeCtx.fillStyle = '#8d6e63';
-                                arcadeCtx.fillRect(bLeft + bW * 0.82, bTop + bH * 0.2, bW * 0.14, bH * 0.55);
-                                arcadeCtx.strokeRect(bLeft + bW * 0.82, bTop + bH * 0.2, bW * 0.14, bH * 0.55);
+                                // Raised Hand
+                                arcadeCtx.fillStyle = '#ffd1a4';
+                                arcadeCtx.beginPath();
+                                arcadeCtx.arc(bLeft - bW * 0.12, bTop + bH * 0.16, Math.max(2, bW * 0.08), 0, Math.PI * 2);
+                                arcadeCtx.fill();
 
-                                // Ruler slap indicator text when close
-                                if (s.dist < 3.5) {
-                                    arcadeCtx.fillStyle = '#ff1744';
-                                    arcadeCtx.font = '900 16px "Courier New"';
-                                    arcadeCtx.textAlign = 'center';
-                                    arcadeCtx.fillText("📏 SLAP! SLAP! 📏", screenX, bTop - 8);
-                                }
+                                // Right Arm holding wooden ruler
+                                arcadeCtx.beginPath();
+                                arcadeCtx.moveTo(bLeft + bW * 0.78, bTop + bH * 0.36);
+                                arcadeCtx.lineTo(bLeft + bW * 0.95, bTop + bH * 0.48);
+                                arcadeCtx.stroke();
+
+                                // Authentic Brown Wooden Ruler in hand
+                                arcadeCtx.fillStyle = '#8d6e63';
+                                arcadeCtx.fillRect(bLeft + bW * 0.9, bTop + bH * 0.3, bW * 0.12, bH * 0.4);
+                                arcadeCtx.strokeStyle = '#3e2723';
+                                arcadeCtx.lineWidth = 1;
+                                arcadeCtx.strokeRect(bLeft + bW * 0.9, bTop + bH * 0.3, bW * 0.12, bH * 0.4);
+
+                                // Baldi Head (Classic bald oval head with singular hair strand)
+                                arcadeCtx.fillStyle = '#ffe0b2';
+                                arcadeCtx.beginPath();
+                                arcadeCtx.ellipse(screenX, bTop + bH * 0.2, bW * 0.26, bH * 0.14, 0, 0, Math.PI * 2);
+                                arcadeCtx.fill();
+                                arcadeCtx.strokeStyle = '#000000';
+                                arcadeCtx.lineWidth = Math.max(1.5, 3 / s.dist);
+                                arcadeCtx.stroke();
+
+                                // Singular brown hair strand on top
+                                arcadeCtx.strokeStyle = '#5d4037';
+                                arcadeCtx.lineWidth = 1.5;
+                                arcadeCtx.beginPath();
+                                arcadeCtx.moveTo(screenX, bTop + bH * 0.06);
+                                arcadeCtx.quadraticCurveTo(screenX - 4, bTop + bH * 0.01, screenX - 6, bTop + bH * 0.04);
+                                arcadeCtx.stroke();
+
+                                // Classic Baldi Big Cartoon Eyes & Red Lips
+                                arcadeCtx.fillStyle = '#ffffff';
+                                arcadeCtx.beginPath();
+                                arcadeCtx.arc(screenX - bW * 0.09, bTop + bH * 0.19, Math.max(1, bW * 0.07), 0, Math.PI * 2);
+                                arcadeCtx.arc(screenX + bW * 0.09, bTop + bH * 0.19, Math.max(1, bW * 0.07), 0, Math.PI * 2);
+                                arcadeCtx.fill();
+
+                                // Black pupils
+                                arcadeCtx.fillStyle = '#000000';
+                                arcadeCtx.beginPath();
+                                arcadeCtx.arc(screenX - bW * 0.08, bTop + bH * 0.19, Math.max(1, bW * 0.035), 0, Math.PI * 2);
+                                arcadeCtx.arc(screenX + bW * 0.08, bTop + bH * 0.19, Math.max(1, bW * 0.035), 0, Math.PI * 2);
+                                arcadeCtx.fill();
+
+                                // Red smiling mouth
+                                arcadeCtx.fillStyle = '#d32f2f';
+                                arcadeCtx.beginPath();
+                                arcadeCtx.arc(screenX, bTop + bH * 0.25, Math.max(2, bW * 0.09), 0.1 * Math.PI, 0.9 * Math.PI);
+                                arcadeCtx.fill();
                             }
                         }
                     }
                 });
 
                 // 6. Mini Radar in Top-Right Corner
-                const radarSize = 70;
+                const radarSize = 65;
                 const radarX = cWidth - radarSize - 8;
-                const radarY = 8;
+                const radarY = 38;
                 arcadeCtx.fillStyle = 'rgba(0, 0, 0, 0.75)';
                 arcadeCtx.fillRect(radarX, radarY, radarSize, radarSize);
                 arcadeCtx.strokeStyle = '#76ff03';
@@ -3939,6 +4389,93 @@
                 // Baldi dot (Red)
                 arcadeCtx.fillStyle = '#ff1744';
                 arcadeCtx.fillRect(radarX + schoolBaldi.x * scaleX - 2, radarY + schoolBaldi.y * scaleY - 2, 5, 5);
+
+                // 7. Authentic Baldi HUD Overlay (Matching Reference Image)
+                // Left hanging "EXIT" Red Sign
+                arcadeCtx.fillStyle = '#ffffff';
+                arcadeCtx.fillRect(16, 12, 60, 28);
+                arcadeCtx.strokeStyle = '#d32f2f';
+                arcadeCtx.lineWidth = 3;
+                arcadeCtx.strokeRect(16, 12, 60, 28);
+                arcadeCtx.fillStyle = '#d32f2f';
+                arcadeCtx.font = '900 18px "Courier New", monospace';
+                arcadeCtx.textAlign = 'center';
+                arcadeCtx.fillText("EXIT", 46, 32);
+
+                // Top Stamina Green Bar
+                arcadeCtx.fillStyle = '#76ff03';
+                arcadeCtx.fillRect(14, 2, 130, 6);
+                arcadeCtx.strokeStyle = '#000000';
+                arcadeCtx.lineWidth = 1;
+                arcadeCtx.strokeRect(14, 2, 130, 6);
+
+                // Top Right Classic Baldi Green HUD Indicator Box (with Red & White Lights)
+                const hudW = 110;
+                const hudH = 34;
+                const hudX = cWidth - hudW - 10;
+                const hudY = 2;
+
+                // Green rounded-corner HUD capsule
+                arcadeCtx.fillStyle = '#00c853';
+                arcadeCtx.beginPath();
+                arcadeCtx.roundRect ? arcadeCtx.roundRect(hudX, hudY, hudW, hudH, 12) : arcadeCtx.fillRect(hudX, hudY, hudW, hudH);
+                arcadeCtx.fill();
+                arcadeCtx.strokeStyle = '#000000';
+                arcadeCtx.lineWidth = 2.5;
+                arcadeCtx.stroke();
+
+                // Indicator light 1 (Red pill/circle)
+                arcadeCtx.fillStyle = '#d50000';
+                arcadeCtx.beginPath();
+                arcadeCtx.arc(hudX + 22, hudY + hudH / 2, 10, 0, Math.PI * 2);
+                arcadeCtx.fill();
+                arcadeCtx.strokeStyle = '#000';
+                arcadeCtx.lineWidth = 1.5;
+                arcadeCtx.stroke();
+
+                // Indicator light 2 (White pill/circle)
+                arcadeCtx.fillStyle = '#ffffff';
+                arcadeCtx.beginPath();
+                arcadeCtx.arc(hudX + 54, hudY + hudH / 2, 10, 0, Math.PI * 2);
+                arcadeCtx.fill();
+                arcadeCtx.strokeStyle = '#000';
+                arcadeCtx.lineWidth = 1.5;
+                arcadeCtx.stroke();
+
+                // Indicator light 3 (White pill/circle)
+                arcadeCtx.fillStyle = '#ffffff';
+                arcadeCtx.beginPath();
+                arcadeCtx.arc(hudX + 86, hudY + hudH / 2, 10, 0, Math.PI * 2);
+                arcadeCtx.fill();
+                arcadeCtx.strokeStyle = '#000';
+                arcadeCtx.lineWidth = 1.5;
+                arcadeCtx.stroke();
+
+                // Item Slot text ("Nothing" or item name)
+                arcadeCtx.fillStyle = '#000000';
+                arcadeCtx.font = 'bold 13px "Comic Sans MS", cursive, sans-serif';
+                arcadeCtx.textAlign = 'right';
+                arcadeCtx.fillText("Nothing", cWidth - 12, hudY + hudH + 16);
+
+                // 8. Freeze Overlay Visual Glitch Effect
+                if (isGameFrozen) {
+                    arcadeCtx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+                    arcadeCtx.fillRect(0, 0, cWidth, cHeight);
+
+                    // Glitch VHS scan lines
+                    arcadeCtx.fillStyle = 'rgba(255, 23, 68, 0.35)';
+                    for (let gy = 0; gy < cHeight; gy += 14) {
+                        arcadeCtx.fillRect(0, gy, cWidth, 3);
+                    }
+
+                    arcadeCtx.fillStyle = '#ffff00';
+                    arcadeCtx.font = '900 24px "Courier New", monospace';
+                    arcadeCtx.textAlign = 'center';
+                    arcadeCtx.fillText("⚠️ DETENTION: TIME-OUT ⚠️", cWidth / 2, halfH - 10);
+                    arcadeCtx.fillStyle = '#ffffff';
+                    arcadeCtx.font = 'bold 15px "Courier New", monospace';
+                    arcadeCtx.fillText("[GAME GLITCH DETECTED - FREEZE IN EFFECT]", cWidth / 2, halfH + 20);
+                }
 
                 schoolAnimFrame = requestAnimationFrame(schoolhouseLoop);
             }
@@ -3995,18 +4532,12 @@
             function initSchoolhouseScreen() {
                 if (!arcadeCanvas || !arcadeCtx) return;
                 if (schoolhouseSplashOverlay) schoolhouseSplashOverlay.classList.remove('hidden');
-                arcadeCtx.fillStyle = '#1565c0';
+                arcadeCtx.fillStyle = '#222';
                 arcadeCtx.fillRect(0, 0, arcadeCanvas.width, arcadeCanvas.height);
                 arcadeCtx.fillStyle = '#ffff00';
                 arcadeCtx.font = '900 24px "Courier New"';
                 arcadeCtx.textAlign = 'center';
-                arcadeCtx.fillText("CLASSIC BALDI SCHOOLHOUSE", arcadeCanvas.width / 2, 130);
-                arcadeCtx.fillStyle = '#fff';
-                arcadeCtx.font = 'bold 15px "Comic Sans MS"';
-                arcadeCtx.fillText("Знайди 5 кольорових зошитів та тікай від Балді!", arcadeCanvas.width / 2, 170);
-                arcadeCtx.fillStyle = '#76ff03';
-                arcadeCtx.font = 'bold 15px "Courier New"';
-                arcadeCtx.fillText("Натисніть кнопку «START GAME» для старту!", arcadeCanvas.width / 2, 210);
+                arcadeCtx.fillText("CLASSIC BALDI SCHOOLHOUSE", arcadeCanvas.width / 2, 140);
                 arcadeCtx.textAlign = 'left';
             }
 
